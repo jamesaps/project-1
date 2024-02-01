@@ -23,13 +23,7 @@
     transition: color 0.3s, text-decoration 0.3s;
   }
 
-  
-  .user-icon {
-    color: rgb(76, 146, 187);
-    font-size: 24px; 
-    margin-left: 15px;
-  }
-
+ 
 
 .jumbotron {
   background-image: url(../images/sean-oulashin-KMn4VEeEPR8-unsplash.jpg);
