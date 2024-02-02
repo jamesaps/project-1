@@ -1,8 +1,29 @@
 
 #travel {
-  width: 1900px;
-  height:800px;
+    width: 1900px;
+    height: 800px;
 }
+
+/* NavBar styling */
+.navbar-nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-item {
+    margin: 0px 15px;
+    font-size: 14px;
+}
+
+.a {
+    color: var(--bs-black) !important;
+    text-align: center;
+    transition: color 0.3s, text-decoration 0.3s;
+}
+
+
 
 /* NavBar styling */ 
 .navbar-nav {
@@ -26,32 +47,32 @@
  
 
 .jumbotron {
-  background-image: url(../images/sean-oulashin-KMn4VEeEPR8-unsplash.jpg);
-  background-size: cover;
-  height: calc(100vh - 25px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 50px;
+    background-image: url(../images/sean-oulashin-KMn4VEeEPR8-unsplash.jpg);
+    background-size: cover;
+    height: calc(100vh - 25px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 50px;
 }
 
 #searchBox {
-  width: 400px;
-  height: 50px;
-  border-radius: 10px;
-  background-color: white;
-  color: black;
-  margin-top: 30px;
+    width: 400px;
+    height: 50px;
+    border-radius: 10px;
+    background-color: white;
+    color: black;
+    margin-top: 30px;
 }
 
-#searchBtn{
-  background-color: rgb(76, 146, 187);
-  height: 50px;
-  border-radius: 10px;
+#searchBtn {
+    background-color: rgb(76, 146, 187);
+    height: 50px;
+    border-radius: 10px;
 }
 
 h1 {
-font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 
@@ -67,3 +88,45 @@ a:hover {
     }
   }
   
+
+.footer {
+    background-color: rgb(244, 242, 241);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: rgb(80, 80, 80);
+    font-size: 0.75rem;
+    padding-bottom: 55px;
+}
+
+@media screen and (min-width: 768px) {
+    #social-container {
+        padding-left: 50px;
+    }
+}
+
+#email-input {
+    box-shadow: 0px 10px 10px -10px rgba(0, 0, 0, 0.1);
+}
+
+.subscribe-form-element {
+    font-size: 0.6rem;
+    border-radius: 0;
+}
+
+#newsletter-container {
+    background-color: rgb(249, 248, 247);
+}
+
+@media screen and (min-width: 768px) {
+    #newsletter-container {
+        padding-right: 50px;
+    }
+}
+
+#newletter-subscription {
+    width: 250px;
+}
+
+.footer-section-header,
+.copyright-notice {
+    font-size: 0.75rem;
+}

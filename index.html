@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,14 +46,85 @@
   <div class="jumbotron">
     <hr class="my-4">
 
-    <div id ="surroundBox"> 
+    <div id="surroundBox">
       <h1> Where would you like to go? </h1>
-      <input type="text" id ="searchBox">
+      <input type="text" id="searchBox">
 
       <a class="btn btn-primary btn-lg" href="#" role="button" id="searchBtn">Search</a>
-    
+
     </div>
   </div>
+
+  <footer class="container-fluid footer">
+    <div class="row">
+      <div id="social-container" class="col-12 col-md-7 d-flex justify-content-center pt-5">
+        <div id="social-wrapper" class="pb-5 pb-md-0">
+          <div class="footer-section mb-5">
+            <h1 class="footer-section-header">CONTACT US</h1>
+            <p>Company@domain.com</p>
+          </div>
+
+          <div class="footer-section mb-5">
+            <h1 class="footer-section-header">FOLLOW US</h1>
+
+            <div>
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-facebook-f fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-linkedin-in fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-instagram fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-x-twitter fa-stack-1x"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <p class="copyright-notice">© 2024 Company. | All rights reserved</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="newsletter-container" class="col-12 col-md-5 pt-5">
+        <div id="newsletter-subscription" class="d-block d-md-inline-block ms-0 ms-md-5 pb-5 pb-md-3">
+          <div class="d-flex flex-column align-items-center">
+            <h1 class="footer-section-header">SUBSCRIBE NOW</h1>
+
+            <p class="fs-5 text-black">Join Our Newsletter</p>
+            <form class="row form form-group">
+              <div class="col-12">
+                <input type="email" id="email-input"
+                  class="subscribe-form-element form-control text-center py-3 mb-2 drop-shadow curved curved-hz-1"
+                  placeholder="ENTER EMAIL...">
+              </div>
+              <div class="col-12">
+                <button type="submit" class="subscribe-form-element form-control text-center py-3 bg-black text-white">
+                  SUBSCRIBE<i class="fa-solid fa-arrow-right-long ms-3"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="fluid-container">
+        <div class="footer-spacer"></div>
+      </div>
+    </div>
+  </footer>
   <script src="./assets/script/script.js"> </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
@@ -62,4 +134,5 @@
 
 
 </body>
+
 </html>
