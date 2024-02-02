@@ -1,35 +1,132 @@
-.box {
-    flex: 1;
-    width: 300px; 
-    height: 340px; 
-    margin: 10px;
-    background-color: lightblue; 
-    padding: 10px;
-    display:inline-table;
-    align-content: center;
-    justify-content: center;
-    position: relative;
-    }
 
-  #imageH{
-    height: 200px;
-    width: 280px;
-    position: absolute;
-    bottom: 0;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    align: left;
-  }
-
-  .hotelTitle {
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .cardDiv {
-    text-align: center;
+#travel {
+    width: 1900px;
+    height: 800px;
 }
 
-h5{
+/* NavBar styling */
+.navbar-nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-item {
+    margin: 0px 15px;
+    font-size: 14px;
+}
+
+.a {
+    color: var(--bs-black) !important;
     text-align: center;
+    transition: color 0.3s, text-decoration 0.3s;
+}
+
+
+
+/* NavBar styling */ 
+.navbar-nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .nav-item {
+    margin: 0px 15px;
+    font-size: 14px;
+  }
+  
+  .a {
+    color: var(--bs-black) !important;
+    text-align: center; 
+    transition: color 0.3s, text-decoration 0.3s;
+  }
+
+ 
+
+.jumbotron {
+    background-image: url(../images/sean-oulashin-KMn4VEeEPR8-unsplash.jpg);
+    background-size: cover;
+    height: calc(100vh - 25px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 50px;
+}
+
+#searchBox {
+    width: 400px;
+    height: 50px;
+    border-radius: 10px;
+    background-color: white;
+    color: black;
+    margin-top: 30px;
+}
+
+#searchBtn {
+    background-color: rgb(76, 146, 187);
+    height: 50px;
+    border-radius: 10px;
+}
+
+h1 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+
+/* Hover & Transition */
+a:hover {
+    color:  rgb(76, 146, 187) !important;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .navbar-nav .nav-link {
+      margin-right: 0.5rem;
+    }
+  }
+  
+
+.footer {
+    background-color: rgb(244, 242, 241);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: rgb(80, 80, 80);
+    font-size: 0.75rem;
+    padding-bottom: 55px;
+}
+
+@media screen and (min-width: 768px) {
+    #social-container {
+        padding-left: 50px;
+    }
+}
+
+#email-input {
+    box-shadow: 0px 10px 10px -10px rgba(0, 0, 0, 0.1);
+}
+
+.subscribe-form-element {
+    font-size: 0.6rem;
+    border-radius: 0;
+}
+
+#newsletter-container {
+    background-color: rgb(249, 248, 247);
+}
+
+@media screen and (min-width: 768px) {
+    #newsletter-container {
+        padding-right: 50px;
+    }
+}
+
+#newletter-subscription {
+    width: 250px;
+}
+
+.footer-section-header,
+.copyright-notice {
+    font-size: 0.75rem;
 }

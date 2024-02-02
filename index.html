@@ -1,22 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <link rel="stylesheet" href="./assets/css/style.css">
 
   <title>Travel App </title>
 </head>
+
 <body>
+  <!-- Start navigation bar -->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary customNav" data-bs-theme="light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">TRAVEL APP </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <p class="navbar-toggler-icon"></p>
+      </button>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#searchBox">Search Destination</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#Itinerary Planner">Itinerary Planner</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="bi bi-person"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-person person-icon" viewBox="0 0 16 16">
+                <path
+                  d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- End navigation bar -->
 
+  <div class="jumbotron">
+    <hr class="my-4">
 
+    <div id="surroundBox">
+      <h1> Where would you like to go? </h1>
+      <input type="text" id="searchBox">
 
+      <a class="btn btn-primary btn-lg" href="#" role="button" id="searchBtn">Search</a>
+    </div>
+  </div>
 
 <div class="hotels"></div>
 
+  <footer class="container-fluid footer">
+    <div class="row">
+      <div id="social-container" class="col-12 col-md-7 d-flex justify-content-center pt-5">
+        <div id="social-wrapper" class="pb-5 pb-md-0">
+          <div class="footer-section mb-5">
+            <h1 class="footer-section-header">CONTACT US</h1>
+            <p>Company@domain.com</p>
+          </div>
+
+          <div class="footer-section mb-5">
+            <h1 class="footer-section-header">FOLLOW US</h1>
+
+            <div>
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-facebook-f fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-linkedin-in fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-instagram fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
+                <i class="fa-brands fa-x-twitter fa-stack-1x"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <p class="copyright-notice">© 2024 Company. | All rights reserved</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="newsletter-container" class="col-12 col-md-5 pt-5">
+        <div id="newsletter-subscription" class="d-block d-md-inline-block ms-0 ms-md-5 pb-5 pb-md-3">
+          <div class="d-flex flex-column align-items-center">
+            <h1 class="footer-section-header">SUBSCRIBE NOW</h1>
+
+            <p class="fs-5 text-black">Join Our Newsletter</p>
+            <form class="row form form-group">
+              <div class="col-12">
+                <input type="email" id="email-input"
+                  class="form-control subscribe-form-element text-center py-3 mb-2 drop-shadow"
+                  placeholder="ENTER EMAIL...">
+              </div>
+              <div class="col-12">
+                <button type="submit" class="form-control subscribe-form-element text-center py-3 bg-black text-white">
+                  SUBSCRIBE<i class="fa-solid fa-arrow-right-long ms-3"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="fluid-container">
+        <div class="footer-spacer"></div>
+      </div>
+    </div>
+  </footer>
+  <script src="./assets/script/script.js"> </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="assets/script/script.js"> </script>
+
+  <!-- Popper.js, Bootstrap JS, Font Awesome -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
+    integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
+    crossorigin="anonymous"></script>
+
+>>>>>>> 6568e56ffe90bdb9f21e8824237f6e1bcdace8f7
 </body>
+
 </html>
