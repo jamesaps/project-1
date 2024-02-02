@@ -1,4 +1,8 @@
 
+body {
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
 #travel {
     width: 1900px;
     height: 800px;
@@ -66,15 +70,32 @@
 }
 
 #searchBtn {
-    background-color: rgb(76, 146, 187);
+    background-color: rgb(44, 123, 168);
     height: 50px;
     border-radius: 10px;
+    background-color: black;
+  border-color: black;
 }
+
+
+
 
 h1 {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 30px;
 }
 
+@media screen and (max-width: 768px) {
+  .jumbotron {
+      height: auto;
+      padding: 20px;
+      margin: 20px;
+  }
+
+  #searchBox {
+      width: 100%;
+      margin-top: 20px;
+}
+}
 
 /* Hover & Transition */
 a:hover {
