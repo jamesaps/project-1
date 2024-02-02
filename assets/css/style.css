@@ -1,0 +1,35 @@
+.box {
+    flex: 1;
+    width: 300px; 
+    height: 340px; 
+    margin: 10px;
+    background-color: lightblue; 
+    padding: 10px;
+    display:inline-table;
+    align-content: center;
+    justify-content: center;
+    position: relative;
+    }
+
+  #imageH{
+    height: 200px;
+    width: 280px;
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    align: left;
+  }
+
+  .hotelTitle {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .cardDiv {
+    text-align: center;
+}
+
+h5{
+    text-align: center;
+}
