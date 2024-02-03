@@ -1,4 +1,8 @@
-const cityInput = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query=" + "Madrid" + "&domain=AE&locale=en_GB";
+
+function fetchHotelData(cityName) {
+$(".hotels").empty();
+$("#cityHotel").empty();
+const cityInput = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query=" + cityName + "&domain=AE&locale=en_GB";
 const options2 = {
 	method: 'GET',
 	headers: {
@@ -11,10 +15,10 @@ fetch(cityInput, options2)
 .then(function (response) {
   return response.json();
 })
-.then(function (data) {
-    var cityData = data.data[0].gaiaId
+.then(function (location) {
+    var cityData = location.data[0].gaiaId
     // console.log(cityData)
-console.log(data) 
+console.log(location) 
 
 // var regionID = "2 // need to know how to find this out from user input
 var locale = "en_GB"
@@ -41,13 +45,13 @@ const options = {
     .then(function (data) {
 
       console.log(data);
-      var propertyName = data.properties[0].name;
-      var propertyImage = data.properties[0].propertyImage.image.url;
-      var propertyPrice = data.properties[0].price.lead.formatted;
-      var propertyReview = data.properties[0].reviews.score;
+      var hotelsIn = location.data[0].regionNames.primaryDisplayName;
+      var cityHotels = $("<h3>"); 
+      cityHotels.append("Hotels in " + hotelsIn);
+      $("#cityHotel").append(cityHotels);
 
 
-      for (let hotel = 1; hotel <= 6; hotel++) {
+      for (let hotel = 1; hotel <= 5; hotel++) {
         var hotelOption = $("<div>").addClass("box");
         var oneInfo = $("<h4>");
         var forecastIndex = hotel + 1
@@ -72,4 +76,18 @@ const options = {
        
       
     });
-})
+})};
+
+
+$("#searchBtn").on("click", function(event) {
+ event.preventDefault();
+ $("#dropDown").show();
+var cityName = $("#searchBox").val(); 
+fetchHotelData(cityName);
+$('html, body').animate({
+  scrollTop: $(".hotels").offset().top
+}, 1000);
+
+});
+
+
