@@ -47,7 +47,7 @@ const options = {
       var propertyReview = data.properties[0].reviews.score;
 
 
-      for (let hotel = 1; hotel <= 5; hotel++) {
+      for (let hotel = 1; hotel <= 6; hotel++) {
         var hotelOption = $("<div>").addClass("box");
         var oneInfo = $("<h4>");
         var forecastIndex = hotel + 1
@@ -61,7 +61,7 @@ const options = {
         propertyTitle.append(propertyName)
         hotelOption.append(propertyTitle);
         hotelList.append(
-             propertyReview + "/10" + "<br>" + propertyPrice
+             "Rating: " + propertyReview + "/10" + "<br>" + "Price per night: " + propertyPrice
         );
         hotelOption.append(hotelList);
           var propImg = $("<img>").attr("id","imageH");
@@ -69,6 +69,7 @@ const options = {
           hotelOption.append(propImg);
         $(".hotels").append(hotelOption);
       }
-        
+       
+      
     });
 })
