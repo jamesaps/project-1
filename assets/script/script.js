@@ -6,7 +6,7 @@ const cityInput = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query="
 const options2 = {
 	method: 'GET',
 	headers: {
-		'X-RapidAPI-Key': '9c0a5b734amsh5b8690e71f87c5cp1570e5jsn4366c4881b2c',
+		'X-RapidAPI-Key': '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb',
 		'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
 	}
 };
@@ -33,7 +33,7 @@ var queryURL = "https://hotels-com-provider.p.rapidapi.com/v2/hotels/search?regi
 const options = {
 	method: 'GET',
 	headers: {
-		'X-RapidAPI-Key': '9c0a5b734amsh5b8690e71f87c5cp1570e5jsn4366c4881b2c',
+		'X-RapidAPI-Key': '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb',
 		'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
 	}
 };
