@@ -168,6 +168,14 @@ a:hover {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     color: rgb(80, 80, 80);
     }
+
+ @media screen and (min-width: 768px) {
+     .box {
+        padding-right: 50px;
+        
+     }
+    }
+
   #imageH{
     height: 60%;
     width: 93%;
@@ -175,6 +183,7 @@ a:hover {
     bottom: 0;
     margin-bottom: 10px;
     margin-top: 10px;
+    display: block;
   }
   .hotelTitle {
     font-size: 18px;
@@ -198,5 +207,6 @@ h5{
 }
 
 #dropDown {
-    display:none;
+    /* display:none; */
+    margin-left: 50px;
 }
