@@ -415,6 +415,10 @@ function fitMapToMarkers() {
 }
 
 function resetMap() {
+  if (map !== undefined) {
+    map.off();
+    map.remove();
+  }
   map = L.map('map').setView([51.05, -0.09], 13);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
