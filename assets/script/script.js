@@ -1,5 +1,18 @@
+var loading = false;
+var loadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
+var hotelsContainer1 = document.getElementById('hotels-container');
+var hotelsContainer2 = document.getElementById('hotels');
+var searchButton = document.getElementById('searchBtn');
 
 function fetchHotelData(cityName) {
+  // if script is already processing a previous request, prevent a new request from being processed
+
+  if (loading === true) {
+    return;
+  }
+
+  putPageIntoLoadingState();
+
   $(".hotels").empty();
   $("#cityHotel").empty();
   const cityInput = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query=" + cityName + "&domain=AE&locale=en_GB";
@@ -100,7 +113,6 @@ function fetchHotelData(cityName) {
                 cityHotels.append("Hotels in " + hotelsIn);
                 $("#cityHotel").append(cityHotels);
 
-
                 for (let hotel = 1; hotel <= 5; hotel++) {
                   var hotelOption = $("<div>").addClass("box");
                   var oneInfo = $("<h4>");
@@ -126,17 +138,47 @@ function fetchHotelData(cityName) {
               });
           });
 
+          takePageOutOfLoadingState();
         });
-    })
+    }).catch(function (error) {
+      takePageOutOfLoadingState();
+
+      console.log(error);
+    });
 }
 
+function putPageIntoLoadingState() {
+  showElement(loadingSpinnerContainer);
+  hideElement(hotelsContainer1);
+  hideElement(hotelsContainer2);
+  searchButton.disabled = true;
+
+  loading = true;
+}
+
+function takePageOutOfLoadingState() {
+  hideElement(loadingSpinnerContainer);
+  showElement(hotelsContainer1);
+  showElement(hotelsContainer2);
+  searchButton.disabled = false;
+
+  loading = false;
+}
+
+function hideElement(element) {
+  element.classList.add('d-none');
+}
+
+function showElement(element) {
+  element.classList.remove('d-none');
+}
 $("#searchBtn").on("click", function (event) {
   event.preventDefault();
   $("#dropDown").show();
   var cityName = $("#searchBox").val();
   fetchHotelData(cityName);
-  $('html, body').animate({
-    scrollTop: $(".hotels").offset().top
-  }, 1000);
+  // $('html, body').animate({
+  //   scrollTop: $(".hotels").offset().top
+  // }, 1000);
 
 });
