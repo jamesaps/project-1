@@ -1,4 +1,5 @@
 var loading = false;
+
 var loadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
 var hotelsHeaderContainer = document.getElementById('hotels-container');
 var hotelsBodyContainer = document.getElementById('hotels');
@@ -18,6 +19,54 @@ var apiOptions = {
   }
 };
 
+var saveOptions = {
+  searchTerms: 0,
+  regions: 1,
+  hotels: 2,
+}
+
+var searchTermsData = {}; // { searchTerm: regionId }
+var regionsData = {}; // { regionId: [{id, name}]}
+var hotelsData = {}; // { regionId: [hotel+options] }
+
+loadDataFromLocalStorage();
+
+function loadDataFromLocalStorage() {
+  var localStorageSearchTerms = localStorage.getItem('searchTerms');
+  var localStorageRegions = localStorage.getItem('regions');
+  var localStorageHotels = localStorage.getItem('hotels');
+
+  if (localStorageSearchTerms !== null) {
+    searchTermsData = JSON.parse(localStorageSearchTerms);
+  }
+
+  if (localStorageRegions !== null) {
+    regionsData = JSON.parse(localStorageRegions);
+  }
+
+  if (localStorageHotels !== null) {
+    hotelsData = JSON.parse(localStorageHotels);
+  }
+}
+
+function saveDataToLocalStorage(saveOption) {
+  if (saveOption === undefined || saveOption === saveOptions.searchTerms) {
+    saveObjectToLocalStorage('searchTerms', searchTermsData);
+  }
+
+  if (saveOption === undefined || saveOption === saveOptions.regions) {
+    saveObjectToLocalStorage('regions', regionsData)
+  }
+
+  if (saveOption === undefined || saveOption === saveOptions.hotels) {
+    saveObjectToLocalStorage('hotels', hotelsData);
+  }
+}
+
+function saveObjectToLocalStorage(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
 async function searchLocationForHotels(options = {}) {
   // if script is already processing a previous request, prevent a new request from being processed
   if (loading === true) {
@@ -29,7 +78,6 @@ async function searchLocationForHotels(options = {}) {
   putPageIntoLoadingState();
   emptyHotelContainers();
 
-
   var regionDetails = await getRegionDetailsByLocationName(locationName);
   var hotels = await getHotelsByRegionId(regionDetails.id);
 
@@ -39,16 +87,70 @@ async function searchLocationForHotels(options = {}) {
   scrollToElement(hotelsHeaderContainer);
 }
 
-async function getRegionDetailsByLocationName(locationName) {
-  var url = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query=" + locationName + "&domain=AE&locale=en_GB";
+async function getRegionDetailsByLocationName(searchTerm) {
+  var regionsDetailsByLocationNameFromLocalStorage = getRegionDetailsByLocationNameFromLocalStorage(searchTerm);
+
+  if (regionsDetailsByLocationNameFromLocalStorage !== undefined) {
+    return regionsDetailsByLocationNameFromLocalStorage;
+  }
+
+  var url = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query=" + searchTerm + "&domain=AE&locale=en_GB";
 
   var response = await fetch(url, apiOptions);
   var decodedResponse = await response.json();
 
-  return {
+  console.log(`Made an API call to retrieve location details for search term: "${searchTerm}".`);
+
+  var regionDetails = {
     name: decodedResponse.data[0].regionNames.primaryDisplayName,
     id: decodedResponse.data[0].gaiaId,
   };
+
+  addSearchTermToLocalStorage(searchTerm, regionDetails.id);
+  addRegionDetailsToLocalstorage(regionDetails.id, regionDetails);
+
+  return regionDetails;
+}
+
+function addSearchTermToLocalStorage(locationName, regionId) {
+  var searchTermTrimmedAndLowercased = locationName.trim().toLowerCase();
+
+  searchTermsData[searchTermTrimmedAndLowercased] = regionId;
+
+  saveDataToLocalStorage(saveOptions.searchTerms);
+
+  console.log(`Saved search term: "${locationName}" to local storage.`)
+}
+
+function getRegionDetailsByLocationNameFromLocalStorage(searchTerm) {
+  var searchTermTrimmedAndLowercased = searchTerm.trim().toLowerCase();
+
+  var regionIdBySearchTerm = searchTermsData[searchTermTrimmedAndLowercased];
+
+  if (regionIdBySearchTerm === undefined) {
+    return undefined;
+  }
+
+  console.log(`Search term: "${searchTerm}" retrieved from local storage with regionId: ${regionIdBySearchTerm}.`);
+
+  var regionDetailsByRegionId = regionsData[regionIdBySearchTerm];
+
+  // returns undefined if not found in local storage and can be handled by caller, otherwise returns value found in local storage
+  if (regionIdBySearchTerm === undefined) {
+    return undefined;
+  }
+
+  console.log(`Region details for Region ID: ${regionIdBySearchTerm} retrieved from local storage.`);
+
+  return regionDetailsByRegionId;
+}
+
+function addRegionDetailsToLocalstorage(regionId, regionDetails) {
+  regionsData[regionId] = regionDetails;
+
+  saveDataToLocalStorage(saveOptions.regions);
+
+  console.log(`Saved region details for Region ID: ${regionId} to local storage.`)
 }
 
 async function getHotelsByRegionId(regionId, options = {}) {
@@ -76,6 +178,12 @@ async function getHotelsByRegionId(regionId, options = {}) {
     options.checkoutDate = "2024-09-28";
   }
 
+  var hotelsByRegionFromLocalStorage = getHotelsByRegionIdFromLocalStorage(regionId, options);
+
+  if (hotelsByRegionFromLocalStorage !== undefined) {
+    return hotelsByRegionFromLocalStorage;
+  }
+
   var url = "https://hotels-com-provider.p.rapidapi.com/v2/hotels/search?region_id=" + regionId
     + "&locale=" + options.locale
     + "&checkin_date=" + options.checkinDate
@@ -87,7 +195,36 @@ async function getHotelsByRegionId(regionId, options = {}) {
   var response = await fetch(url, apiOptions);
   var decodedResponse = await response.json();
 
-  return decodedResponse.properties;
+  var hotels = decodedResponse.properties;
+
+  console.log(`Made API call to retrieve hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)}.`);
+
+  addHotelsToLocalStorage(regionId, hotels, options);
+
+  return hotels;
+}
+
+function getHotelsByRegionIdFromLocalStorage(regionId, options) {
+  var hotelsKey = createHotelsSearchKey(regionId, options);
+  console.log(hotelsKey)
+  var hotels = hotelsData[hotelsKey];
+
+  if (hotels === undefined) {
+    return undefined;
+  }
+
+  console.log(`Hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} retrieved from local storage.`)
+
+  return hotels;
+}
+
+function addHotelsToLocalStorage(regionId, hotels, options) {
+  var hotelsKey = createHotelsSearchKey(regionId, options);
+  hotelsData[hotelsKey] = hotels;
+
+  saveDataToLocalStorage(saveOptions.hotels);
+
+  console.log(`Saved hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} to local storage.`)
 }
 
 function renderHotels(regionName, hotels, numberOfHotelsToDisplay = 8) {
@@ -168,9 +305,35 @@ function emptyHotelContainers() {
 }
 
 function scrollToElement(element) {
-  $('html, body').animate({
+  // turn off smooth scroll which interacts weirdly with scrollTop
+  document.documentElement.style.setProperty('scroll-behavior', 'auto', 'important');
+
+  $('html, body').stop().animate({ // Prevent page being overwhelmed by scroll animations
     scrollTop: $(element).offset().top
-  }, 1000);
+  }, 1000, undefined, function () {
+    // restore default scroll behavior
+    document.documentElement.style.removeProperty('scroll-behavior');
+  });
+}
+
+function createHotelsSearchKey(regionId, options) {
+  var optionsAsSortedArrayToJSONString = convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(options);
+  return `${regionId}${optionsAsSortedArrayToJSONString}`;
+}
+
+function convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(object) {
+  var objectAsArray = Object.entries(object);
+  var objectAsSortedArray = objectAsArray.sort(function (a, b) {
+    if (a[0] === b[0]) {
+      return 0;
+    } else if (a[0] > b[0]) {
+      return 1;
+    } else {
+      return -1;
+    }
+  });
+
+  return JSON.stringify(objectAsSortedArray);
 }
 
 $(searchForm).on('submit', function (event) {
