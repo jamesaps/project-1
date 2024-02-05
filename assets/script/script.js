@@ -6,6 +6,7 @@ var hotelsBodyContainer = document.getElementById('hotels');
 var hotelSearchLocationElement = document.getElementById('cityHotel');
 var searchForm = document.getElementById('surroundBox');
 var searchButton = document.getElementById('searchBtn');
+var searchLoadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
 
 var apiKey = '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb';
 var apiHost = 'hotels-com-provider.p.rapidapi.com';
@@ -272,7 +273,7 @@ function putPageIntoLoadingState() {
   hideElement(hotelsBodyContainer);
   searchButton.disabled = true;
 
-  scrollToElement(loadingSpinnerContainer);
+  scrollToElement(searchLoadingSpinnerContainer);
 
   loading = true;
 }
@@ -308,8 +309,6 @@ function scrollToElement(element) {
   // turn off smooth scroll which interacts weirdly with scrollTop
   document.documentElement.style.setProperty('scroll-behavior', 'auto', 'important');
 
-  console.log(Date.now() + "~" + $(element).offset().top)
-
   $('html, body').stop().animate({ // Prevent page being overwhelmed by scroll animations
     scrollTop: $(element).offset().top
   }, 1000, undefined, function () {
@@ -344,8 +343,9 @@ $(searchForm).on('submit', function (event) {
 });
 
 $(".dropdown-item").on("click", function (event) {
-  // Update sortOrder when an item is clicked
   event.preventDefault();
+
+  // Update sortOrder when an item is clicked
   sortOrder = $(this).data("index");
 
   searchLocationForHotels({ sortOrder });
