@@ -69,12 +69,12 @@
   <div class="jumbotron">
     <hr class="my-4">
 
-    <div id="surroundBox">
+    <form id="surroundBox">
       <h1> Where would you like to go? </h1>
       <input type="text" id="searchBox" placeholder="Enter a city ">
 
-      <button class="btn btn-primary btn-lg" href="#cityHotel" role="button" id="searchBtn">SEARCH</button>
-    </div>
+      <button type="submit" class="btn btn-primary btn-lg" role="button" id="searchBtn">SEARCH</button>
+    </form>
   </div>
   <!-- // jumbotron and search -->
 
@@ -89,19 +89,21 @@
   </div>
 
   <!-- Hotels cards  -->
-  <div id="hotels-container" class="container d-none">
+  <div id="hotels-container" class="container-fluid d-none">
     <div class="row" id="cityHotel"></div>
-    <div class="col-md-5">
-      <div class="dropdown" id="dropDown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
-          data-bs-toggle="dropdown" aria-expanded="false">
-          FILTER
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-          <li><a class="dropdown-item" id="item1" data-index="REVIEW">REVIEW</a></li>
-          <li><a class="dropdown-item" id="item2" data-index="RECOMMENDED">RECOMMENDED</a></li>
-          <li><a class="dropdown-item" id="item3" data-index="DISTANCE">DISTANCE</a></li>
-        </ul>
+    <div class="row justify-content-start">
+      <div class="col-12">
+        <div class="dropdown" id="dropDown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            FILTER
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" id="item1" data-index="REVIEW">REVIEW</a></li>
+            <li><a class="dropdown-item" id="item2" data-index="RECOMMENDED">RECOMMENDED</a></li>
+            <li><a class="dropdown-item" id="item3" data-index="DISTANCE">DISTANCE</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

@@ -225,6 +225,12 @@ h5 {
     margin-left: 50px;
 }
 
+@media screen and (max-width: 768px) {
+    #dropDown {
+        margin-left: 20px;
+    }
+}
+
 /* Loading spinner */
 #hotel-search-loading-spinner-container {
     margin-bottom: 50px;
