@@ -157,14 +157,15 @@
             <h1 class="footer-section-header">SUBSCRIBE NOW</h1>
 
             <p class="fs-5 text-black">Join Our Newsletter</p>
-            <form class="row form form-group">
+            <form class="row form form-group" id="newsletter-subscription-form">
               <div class="col-12">
                 <input type="email" id="email-input"
                   class="form-control subscribe-form-element text-center py-3 mb-2 drop-shadow"
                   placeholder="ENTER EMAIL...">
               </div>
               <div class="col-12">
-                <button type="submit" class="form-control subscribe-form-element text-center py-3 bg-black text-white">
+                <button type="submit" id="newsletter-subscribe-button"
+                  class="form-control subscribe-form-element text-center py-3 bg-black text-white">
                   SUBSCRIBE<i class="fa-solid fa-arrow-right-long ms-3"></i>
                 </button>
               </div>
@@ -193,7 +194,8 @@
     integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
     crossorigin="anonymous"></script>
 
-  <script src="./assets/script/script.js"> </script>
+  <script src="./assets/script/script.js"></script>
+  <script src="./assets/script/newsletter.js"></script>
 
 </body>
 
