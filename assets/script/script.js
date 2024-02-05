@@ -79,7 +79,7 @@ async function searchLocationForHotels(options = {}) {
   emptyHotelContainers();
 
   var regionDetails = await getRegionDetailsByLocationName(locationName);
-  var hotels = await getHotelsByRegionId(regionDetails.id);
+  var hotels = await getHotelsByRegionId(regionDetails.id, options);
 
   renderHotels(regionDetails.name, hotels);
 
