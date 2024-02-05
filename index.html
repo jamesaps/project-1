@@ -78,10 +78,19 @@
   </div>
   <!-- // jumbotron and search -->
 
+  <!-- Loading spinner -->
+
+  <div id="hotel-search-loading-spinner-container" class="container-fluid d-none">
+    <div id="hotel-search-loading-spinner" class="d-flex justify-content-center">
+      <div class="spinner-border text-secondary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
 
   <!-- Hotels cards  -->
   <div id="hotels-container" class="container d-none">
-    <div class="row" id="cityHotel"> </div>
+    <div class="row" id="cityHotel"></div>
     <div class="col-md-5">
       <div class="dropdown d-none" id="dropDown">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
@@ -96,7 +105,7 @@
       </div>
     </div>
   </div>
-  <div class="row hotels"></div>
+  <div class="row hotels d-none"></div>
 
   <!-- Footer Start -->
   <footer class="container-fluid footer">
