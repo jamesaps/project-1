@@ -243,7 +243,8 @@ function renderHotels(regionName, hotels, numberOfHotelsToDisplay = 8) {
 function createHotelCard(hotel) {
   var hotelContainer = $("<div>").addClass("box");
 
-  var hotelTitle = $("<h5>")
+  var hotelTitle = $("<h5>");
+  hotelTitle.append(hotel.name);
   hotelContainer.append(hotelTitle);
 
   var hotelDetailsContainer = $("<div>").addClass("cardDiv")

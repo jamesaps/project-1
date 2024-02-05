@@ -26,8 +26,6 @@
     transition: color 0.3s, text-decoration 0.3s;
 }
 
-
-
 /* NavBar styling */
 .navbar-nav {
     width: 100%;
@@ -108,7 +106,7 @@ a:hover {
     }
 }
 
-
+/* Footer Start */
 .footer {
     background-color: rgb(244, 242, 241);
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -160,6 +158,8 @@ a:hover {
 .fa-stack {
     margin-bottom: 5px;
 }
+
+/* Footer End */
 
 .box {
     display: flex;
