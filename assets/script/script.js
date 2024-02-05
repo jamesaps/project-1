@@ -139,6 +139,10 @@ function fetchHotelData(cityName) {
           });
 
           takePageOutOfLoadingState();
+
+          $('html, body').animate({
+            scrollTop: $("#hotels-container").offset().top
+          }, 1000);
         });
     }).catch(function (error) {
       takePageOutOfLoadingState();
@@ -152,6 +156,10 @@ function putPageIntoLoadingState() {
   hideElement(hotelsContainer1);
   hideElement(hotelsContainer2);
   searchButton.disabled = true;
+
+  $('html, body').animate({
+    scrollTop: $("#hotel-search-loading-spinner-container").offset().top
+  }, 1000);
 
   loading = true;
 }
