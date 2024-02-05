@@ -241,3 +241,27 @@ h5 {
         margin-bottom: 20px;
     }
 }
+
+/* Map start */
+
+.map-container {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+#map {
+    height: 600px;
+}
+
+@media screen and (max-width: 768px) {
+    .map-container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    #map {
+        height: 400px;
+    }
+}
+
+/* Map end */

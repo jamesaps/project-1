@@ -7,9 +7,12 @@ var hotelSearchLocationElement = document.getElementById('cityHotel');
 var searchForm = document.getElementById('surroundBox');
 var searchButton = document.getElementById('searchBtn');
 var searchLoadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
+var mapContainer = document.getElementById('map-container');
 
 var apiKey = '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb';
 var apiHost = 'hotels-com-provider.p.rapidapi.com';
+
+var numberOfHotelsToDisplay = 8;
 
 var apiOptions = {
   method: 'GET',
@@ -30,6 +33,7 @@ var regionsData = {}; // { regionId: [{id, name}]}
 var hotelsData = {}; // { regionId: [hotel+options] }
 
 loadDataFromLocalStorage();
+console.log(hotelsData)
 
 function loadDataFromLocalStorage() {
   var localStorageSearchTerms = localStorage.getItem('searchTerms');
@@ -81,9 +85,11 @@ async function searchLocationForHotels(options = {}) {
   var regionDetails = await getRegionDetailsByLocationName(locationName);
   var hotels = await getHotelsByRegionId(regionDetails.id, options);
 
-  renderHotels(regionDetails.name, hotels);
+  renderHotels(regionDetails.name, hotels, numberOfHotelsToDisplay);
 
   takePageOutOfLoadingState();
+
+  updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplay);
   scrollToElement(hotelsHeaderContainer);
 }
 
@@ -227,7 +233,7 @@ function addHotelsToLocalStorage(regionId, hotels, options) {
   console.log(`Saved hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} to local storage.`)
 }
 
-function renderHotels(regionName, hotels, numberOfHotelsToDisplay = 8) {
+function renderHotels(regionName, hotels, numberOfHotelsToDisplay) {
   emptyHotelContainers();
 
   var hotelContainerHeader = createHotelContainerHeader(regionName);
@@ -272,6 +278,7 @@ function putPageIntoLoadingState() {
   hideElement(hotelsHeaderContainer);
   hideElement(hotelsBodyContainer);
   searchButton.disabled = true;
+  hideElement(mapContainer);
 
   scrollToElement(searchLoadingSpinnerContainer);
 
@@ -283,6 +290,7 @@ function takePageOutOfLoadingState() {
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
   searchButton.disabled = false;
+  showElement(mapContainer);
 
   loading = false;
 }
@@ -353,6 +361,65 @@ $(".dropdown-item").on("click", function (event) {
 
 /* Maps functionality Start */
 
+var mapMarkers = [];
 
+var map;
+
+function updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplay) {
+  var slicedHotels = hotels.slice(0, numberOfHotelsToDisplay);
+
+  resetMap();
+  createMapMarkersForHotels(slicedHotels);
+  addMarkersToMap();
+  fitMapToMarkers();
+}
+
+function createMapMarkersForHotels(hotels) {
+  mapMarkers = [];
+
+  for (var i = 0; i < hotels.length; ++i) {
+    createMapMarker(hotels[i]);
+  }
+}
+
+function createMapMarker(hotel) {
+  var { latitude, longitude } = hotel.mapMarker.latLong;
+  var latLng = [latitude, longitude];
+
+  var marker = L.marker(latLng, { title: hotel.name });
+  mapMarkers.push(marker);
+
+  var popupElement = document.createElement('div');
+  popupElement.textContent = hotel.name;
+
+  var popup = L.popup()
+    .setLatLng(latLng)
+    .setContent(popupElement);
+
+  marker.bindPopup(popup);
+  marker.on('click', function (e) {
+    var popup = e.target.getPopup();
+
+  })
+}
+
+function addMarkersToMap() {
+  for (var i = 0; i < mapMarkers.length; ++i) {
+    mapMarkers[i].addTo(map);
+  }
+}
+
+function fitMapToMarkers() {
+  var featureGroup = L.featureGroup(mapMarkers);
+  map.fitBounds(featureGroup.getBounds());
+}
+
+function resetMap() {
+  map = L.map('map').setView([51.05, -0.09], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+}
 
 /* Maps functionality End */
