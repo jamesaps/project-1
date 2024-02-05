@@ -1,173 +1,287 @@
 var loading = false;
+
 var loadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
-var hotelsContainer1 = document.getElementById('hotels-container');
-var hotelsContainer2 = document.getElementById('hotels');
+var hotelsHeaderContainer = document.getElementById('hotels-container');
+var hotelsBodyContainer = document.getElementById('hotels');
+var hotelSearchLocationElement = document.getElementById('cityHotel');
+var searchForm = document.getElementById('surroundBox');
 var searchButton = document.getElementById('searchBtn');
+var searchLoadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
 
-function fetchHotelData(cityName) {
+var apiKey = '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb';
+var apiHost = 'hotels-com-provider.p.rapidapi.com';
+
+var apiOptions = {
+  method: 'GET',
+  headers: {
+    'X-RapidAPI-Key': apiKey,
+    'X-RapidAPI-Host': apiHost,
+  }
+};
+
+var saveOptions = {
+  searchTerms: 0,
+  regions: 1,
+  hotels: 2,
+}
+
+var searchTermsData = {}; // { searchTerm: regionId }
+var regionsData = {}; // { regionId: [{id, name}]}
+var hotelsData = {}; // { regionId: [hotel+options] }
+
+loadDataFromLocalStorage();
+
+function loadDataFromLocalStorage() {
+  var localStorageSearchTerms = localStorage.getItem('searchTerms');
+  var localStorageRegions = localStorage.getItem('regions');
+  var localStorageHotels = localStorage.getItem('hotels');
+
+  if (localStorageSearchTerms !== null) {
+    searchTermsData = JSON.parse(localStorageSearchTerms);
+  }
+
+  if (localStorageRegions !== null) {
+    regionsData = JSON.parse(localStorageRegions);
+  }
+
+  if (localStorageHotels !== null) {
+    hotelsData = JSON.parse(localStorageHotels);
+  }
+}
+
+function saveDataToLocalStorage(saveOption) {
+  if (saveOption === undefined || saveOption === saveOptions.searchTerms) {
+    saveObjectToLocalStorage('searchTerms', searchTermsData);
+  }
+
+  if (saveOption === undefined || saveOption === saveOptions.regions) {
+    saveObjectToLocalStorage('regions', regionsData)
+  }
+
+  if (saveOption === undefined || saveOption === saveOptions.hotels) {
+    saveObjectToLocalStorage('hotels', hotelsData);
+  }
+}
+
+function saveObjectToLocalStorage(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+async function searchLocationForHotels(options = {}) {
   // if script is already processing a previous request, prevent a new request from being processed
-
   if (loading === true) {
     return;
   }
 
-  putPageIntoLoadingState();
+  var locationName = $('#searchBox').val();
 
-  $(".hotels").empty();
-  $("#cityHotel").empty();
-  const cityInput = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query=" + cityName + "&domain=AE&locale=en_GB";
-  const options2 = {
-    method: 'GET',
-    headers: {
-      'X-RapidAPI-Key': '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb',
-      'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
-    }
+  putPageIntoLoadingState();
+  emptyHotelContainers();
+
+  var regionDetails = await getRegionDetailsByLocationName(locationName);
+  var hotels = await getHotelsByRegionId(regionDetails.id, options);
+
+  renderHotels(regionDetails.name, hotels);
+
+  takePageOutOfLoadingState();
+  scrollToElement(hotelsHeaderContainer);
+}
+
+async function getRegionDetailsByLocationName(searchTerm) {
+  var regionsDetailsByLocationNameFromLocalStorage = getRegionDetailsByLocationNameFromLocalStorage(searchTerm);
+
+  if (regionsDetailsByLocationNameFromLocalStorage !== undefined) {
+    return regionsDetailsByLocationNameFromLocalStorage;
+  }
+
+  var url = "https://hotels-com-provider.p.rapidapi.com/v2/regions?query=" + searchTerm + "&domain=AE&locale=en_GB";
+
+  var response = await fetch(url, apiOptions);
+  var decodedResponse = await response.json();
+
+  console.log(`Made an API call to retrieve location details for search term: "${searchTerm}".`);
+
+  var regionDetails = {
+    name: decodedResponse.data[0].regionNames.primaryDisplayName,
+    id: decodedResponse.data[0].gaiaId,
   };
 
-  fetch(cityInput, options2)
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (location) {
-      var cityData = location.data[0].gaiaId
-      // console.log(cityData)
-      console.log(location)
+  addSearchTermToLocalStorage(searchTerm, regionDetails.id);
+  addRegionDetailsToLocalstorage(regionDetails.id, regionDetails);
 
-      var locale = "en_GB"
-      var checkin_date = "2024-09-26"
-      var sortOrder = "RECOMMENDED" // option
-      var adults_number = "1"
-      var domain = "AE"
-      var checkout_date = "2024-09-28"
+  return regionDetails;
+}
 
-      var queryURL = "https://hotels-com-provider.p.rapidapi.com/v2/hotels/search?region_id=" + cityData + "&locale=" + locale + "&checkin_date=" + checkin_date + "&sort_order=" + sortOrder + "&adults_number=" + adults_number + "&domain=" + domain + "&checkout_date=" + checkout_date;
-      const options = {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb',
-          'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
-        }
-      };
+function addSearchTermToLocalStorage(locationName, regionId) {
+  var searchTermTrimmedAndLowercased = locationName.trim().toLowerCase();
 
-      fetch(queryURL, options)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
+  searchTermsData[searchTermTrimmedAndLowercased] = regionId;
 
-          console.log(data);
-          var hotelsIn = location.data[0].regionNames.primaryDisplayName;
-          var cityHotels = $("<h3>");
-          cityHotels.append("Hotels in " + hotelsIn);
-          $("#cityHotel").append(cityHotels);
+  saveDataToLocalStorage(saveOptions.searchTerms);
 
+  console.log(`Saved search term: "${locationName}" to local storage.`)
+}
 
-          for (let hotel = 1; hotel <= 5; hotel++) {
-            var hotelOption = $("<div>").addClass("box");
-            var oneInfo = $("<h4>");
-            var forecastIndex = hotel + 1
-            hotelOption.append(oneInfo);
-            var propertyName = data.properties[forecastIndex].name;
-            var propertyImage = data.properties[forecastIndex].propertyImage.image.url;
-            var propertyPrice = data.properties[forecastIndex].price.lead.formatted;
-            var propertyReview = data.properties[forecastIndex].reviews.score;
-            var hotelList = $("<div>").addClass("cardDiv")
-            var propertyTitle = $("<h5>")
-            propertyTitle.append(propertyName)
-            hotelOption.append(propertyTitle);
-            hotelList.append(
-              "Rating: " + propertyReview + "/10" + "<br>" + "Price per night: " + propertyPrice
-            );
-            hotelOption.append(hotelList);
-            var propImg = $("<img>").attr("id", "imageH");
-            propImg.attr("src", propertyImage);
-            hotelOption.append(propImg);
-            $(".hotels").append(hotelOption);
-          }
+function getRegionDetailsByLocationNameFromLocalStorage(searchTerm) {
+  var searchTermTrimmedAndLowercased = searchTerm.trim().toLowerCase();
 
-          $(".dropdown-item").on("click", function () {
-            // Update sortOrder when an item is clicked
-            sortOrder = $(this).data("index");
-            $(".hotels").empty();
-            $("#cityHotel").empty();
-            console.log(sortOrder);
+  var regionIdBySearchTerm = searchTermsData[searchTermTrimmedAndLowercased];
 
-            var queryURL = "https://hotels-com-provider.p.rapidapi.com/v2/hotels/search?region_id=" + cityData + "&locale=" + locale + "&checkin_date=" + checkin_date + "&sort_order=" + sortOrder + "&adults_number=" + adults_number + "&domain=" + domain + "&checkout_date=" + checkout_date;
-            const options = {
-              method: 'GET',
-              headers: {
-                'X-RapidAPI-Key': '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb',
-                'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
-              }
-            };
+  if (regionIdBySearchTerm === undefined) {
+    return undefined;
+  }
 
-            fetch(queryURL, options)
-              .then(function (response) {
-                return response.json();
-              })
-              .then(function (data) {
+  console.log(`Search term: "${searchTerm}" retrieved from local storage with regionId: ${regionIdBySearchTerm}.`);
 
-                console.log(data);
-                var hotelsIn = location.data[0].regionNames.primaryDisplayName;
-                var cityHotels = $("<h3>");
-                cityHotels.append("Hotels in " + hotelsIn);
-                $("#cityHotel").append(cityHotels);
+  var regionDetailsByRegionId = regionsData[regionIdBySearchTerm];
 
-                for (let hotel = 1; hotel <= 5; hotel++) {
-                  var hotelOption = $("<div>").addClass("box");
-                  var oneInfo = $("<h4>");
-                  var forecastIndex = hotel + 1
-                  hotelOption.append(oneInfo);
-                  var propertyName = data.properties[forecastIndex].name;
-                  var propertyImage = data.properties[forecastIndex].propertyImage.image.url;
-                  var propertyPrice = data.properties[forecastIndex].price.lead.formatted;
-                  var propertyReview = data.properties[forecastIndex].reviews.score;
-                  var hotelList = $("<div>").addClass("cardDiv")
-                  var propertyTitle = $("<h5>")
-                  propertyTitle.append(propertyName)
-                  hotelOption.append(propertyTitle);
-                  hotelList.append(
-                    "Rating: " + propertyReview + "/10" + "<br>" + "Price per night: " + propertyPrice
-                  );
-                  hotelOption.append(hotelList);
-                  var propImg = $("<img>").attr("id", "imageH");
-                  propImg.attr("src", propertyImage);
-                  hotelOption.append(propImg);
-                  $(".hotels").append(hotelOption);
-                }
-              });
-          });
+  // returns undefined if not found in local storage and can be handled by caller, otherwise returns value found in local storage
+  if (regionIdBySearchTerm === undefined) {
+    return undefined;
+  }
 
-          takePageOutOfLoadingState();
+  console.log(`Region details for Region ID: ${regionIdBySearchTerm} retrieved from local storage.`);
 
-          $('html, body').animate({
-            scrollTop: $("#hotels-container").offset().top
-          }, 1000);
-        });
-    }).catch(function (error) {
-      takePageOutOfLoadingState();
+  return regionDetailsByRegionId;
+}
 
-      console.log(error);
-    });
+function addRegionDetailsToLocalstorage(regionId, regionDetails) {
+  regionsData[regionId] = regionDetails;
+
+  saveDataToLocalStorage(saveOptions.regions);
+
+  console.log(`Saved region details for Region ID: ${regionId} to local storage.`)
+}
+
+async function getHotelsByRegionId(regionId, options = {}) {
+  if (options.locale === undefined) {
+    options.locale = "en_GB";
+  }
+
+  if (options.checkinDate === undefined) {
+    options.checkinDate = "2024-09-26";
+  }
+
+  if (options.sortOrder === undefined) {
+    options.sortOrder = "RECOMMENDED";
+  }
+
+  if (options.adultsNumber === undefined) {
+    options.adultsNumber = "1"
+  }
+
+  if (options.domain === undefined) {
+    options.domain = "AE";
+  }
+
+  if (options.checkoutDate === undefined) {
+    options.checkoutDate = "2024-09-28";
+  }
+
+  var hotelsByRegionFromLocalStorage = getHotelsByRegionIdFromLocalStorage(regionId, options);
+
+  if (hotelsByRegionFromLocalStorage !== undefined) {
+    return hotelsByRegionFromLocalStorage;
+  }
+
+  var url = "https://hotels-com-provider.p.rapidapi.com/v2/hotels/search?region_id=" + regionId
+    + "&locale=" + options.locale
+    + "&checkin_date=" + options.checkinDate
+    + "&sort_order=" + options.sortOrder
+    + "&adults_number=" + options.adultsNumber
+    + "&domain=" + options.domain
+    + "&checkout_date=" + options.checkoutDate;
+
+  var response = await fetch(url, apiOptions);
+  var decodedResponse = await response.json();
+
+  var hotels = decodedResponse.properties;
+
+  console.log(`Made API call to retrieve hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)}.`);
+
+  addHotelsToLocalStorage(regionId, hotels, options);
+
+  return hotels;
+}
+
+function getHotelsByRegionIdFromLocalStorage(regionId, options) {
+  var hotelsKey = createHotelsSearchKey(regionId, options);
+  console.log(hotelsKey)
+  var hotels = hotelsData[hotelsKey];
+
+  if (hotels === undefined) {
+    return undefined;
+  }
+
+  console.log(`Hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} retrieved from local storage.`)
+
+  return hotels;
+}
+
+function addHotelsToLocalStorage(regionId, hotels, options) {
+  var hotelsKey = createHotelsSearchKey(regionId, options);
+  hotelsData[hotelsKey] = hotels;
+
+  saveDataToLocalStorage(saveOptions.hotels);
+
+  console.log(`Saved hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} to local storage.`)
+}
+
+function renderHotels(regionName, hotels, numberOfHotelsToDisplay = 8) {
+  emptyHotelContainers();
+
+  var hotelContainerHeader = createHotelContainerHeader(regionName);
+  $(hotelSearchLocationElement).append(hotelContainerHeader);
+
+  for (var i = 0; i < numberOfHotelsToDisplay; ++i) {
+    var hotelCard = createHotelCard(hotels[i]);
+
+    $(hotelsBodyContainer).append(hotelCard);
+  }
+}
+
+function createHotelCard(hotel) {
+  var hotelContainer = $("<div>").addClass("box");
+
+  var hotelTitle = $("<h5>");
+  hotelTitle.append(hotel.name);
+  hotelContainer.append(hotelTitle);
+
+  var hotelDetailsContainer = $("<div>").addClass("cardDiv")
+  hotelContainer.append(hotelDetailsContainer);
+
+  var hotelDetails = "Rating: " + hotel.reviews.score + "/10" + "<br>" + "Price per night: " + hotel.price.lead.formatted;
+  hotelDetailsContainer.append(hotelDetails);
+
+  var hotelImage = $("<img>").attr("id", "imageH");
+  hotelImage.attr("src", hotel.propertyImage.image.url);
+  hotelDetailsContainer.append(hotelImage);
+
+  return hotelContainer;
+}
+
+function createHotelContainerHeader(regionName) {
+  var hotelHeader = $("<h3>");
+  hotelHeader.append("Hotels in " + regionName);
+
+  return hotelHeader;
 }
 
 function putPageIntoLoadingState() {
   showElement(loadingSpinnerContainer);
-  hideElement(hotelsContainer1);
-  hideElement(hotelsContainer2);
+  hideElement(hotelsHeaderContainer);
+  hideElement(hotelsBodyContainer);
   searchButton.disabled = true;
 
-  $('html, body').animate({
-    scrollTop: $("#hotel-search-loading-spinner-container").offset().top
-  }, 1000);
+  scrollToElement(searchLoadingSpinnerContainer);
 
   loading = true;
 }
 
 function takePageOutOfLoadingState() {
   hideElement(loadingSpinnerContainer);
-  showElement(hotelsContainer1);
-  showElement(hotelsContainer2);
+  showElement(hotelsHeaderContainer);
+  showElement(hotelsBodyContainer);
   searchButton.disabled = false;
 
   loading = false;
@@ -180,13 +294,59 @@ function hideElement(element) {
 function showElement(element) {
   element.classList.remove('d-none');
 }
-$("#searchBtn").on("click", function (event) {
-  event.preventDefault();
-  $("#dropDown").show();
-  var cityName = $("#searchBox").val();
-  fetchHotelData(cityName);
-  // $('html, body').animate({
-  //   scrollTop: $(".hotels").offset().top
-  // }, 1000);
 
+function emptyElement(element) {
+  element.innerHTML = '';
+}
+
+function emptyHotelContainers() {
+  // emptyElement(hotelsHeaderContainer);
+  emptyElement(hotelsBodyContainer);
+  emptyElement(hotelSearchLocationElement);
+}
+
+function scrollToElement(element) {
+  // turn off smooth scroll which interacts weirdly with scrollTop
+  document.documentElement.style.setProperty('scroll-behavior', 'auto', 'important');
+
+  $('html, body').stop().animate({ // Prevent page being overwhelmed by scroll animations
+    scrollTop: $(element).offset().top
+  }, 1000, undefined, function () {
+    // restore default scroll behavior
+    document.documentElement.style.removeProperty('scroll-behavior');
+  });
+}
+
+function createHotelsSearchKey(regionId, options) {
+  var optionsAsSortedArrayToJSONString = convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(options);
+  return `${regionId}${optionsAsSortedArrayToJSONString}`;
+}
+
+function convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(object) {
+  var objectAsArray = Object.entries(object);
+  var objectAsSortedArray = objectAsArray.sort(function (a, b) {
+    if (a[0] === b[0]) {
+      return 0;
+    } else if (a[0] > b[0]) {
+      return 1;
+    } else {
+      return -1;
+    }
+  });
+
+  return JSON.stringify(objectAsSortedArray);
+}
+
+$(searchForm).on('submit', function (event) {
+  event.preventDefault();
+  searchLocationForHotels();
+});
+
+$(".dropdown-item").on("click", function (event) {
+  event.preventDefault();
+
+  // Update sortOrder when an item is clicked
+  sortOrder = $(this).data("index");
+
+  searchLocationForHotels({ sortOrder });
 });
