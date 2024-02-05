@@ -350,3 +350,9 @@ $(".dropdown-item").on("click", function (event) {
 
   searchLocationForHotels({ sortOrder });
 });
+
+/* Maps functionality Start */
+
+
+
+/* Maps functionality End */
