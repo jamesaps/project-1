@@ -81,7 +81,7 @@
           <div id="hotel-search-loading-spinner-container"
             class="d-none position-absolute top-50 end-0 translate-middle-y z-2 position-relative">
             <div id="hotel-search-loading-spinner" class="d-flex justify-content-center">
-              <div class="spinner-border text-secondary" role="status">
+              <div id="hotel-search-spinner-border" class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
@@ -92,18 +92,8 @@
   </div>
   <!-- // jumbotron and search -->
 
-  <!-- Loading spinner -->
-  <div id="hotel-search-loading-spinner-container" class="container-fluid d-none">
-    <div id="hotel-search-loading-spinner" class="d-flex justify-content-center">
-      <div class="spinner-border text-secondary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
-  </div>
-  <!-- // Loading spinner -->
-
   <!-- Hotels cards  -->
-  <div id="hotels-container" class="container-fluid d-none">
+  <div id="hotels-header" class="container-fluid d-none">
     <div class="row" id="cityHotel"></div>
     <div class="row justify-content-start">
       <div class="col-12">
@@ -121,10 +111,10 @@
       </div>
     </div>
   </div>
-  <div id="hotels" class="row hotels d-none"></div>
-  <div id="map-container" class="container-fluid map-container d-none">
+  <div id="hotels-container" class="container-fluid"></div>
+  <!-- <div id="map-container" class="container-fluid map-container d-none">
     <div id="map"></div>
-  </div>
+  </div> -->
 
   <!-- Footer Start -->
   <footer class="container-fluid footer">

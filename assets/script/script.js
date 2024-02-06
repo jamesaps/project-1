@@ -4,19 +4,23 @@ var jumbotronDocked = false;
 var loadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
 var jumbotronContainer = document.getElementById('jumbotron-container');
 var jumbotron = document.getElementById('jumbotron');
-var hotelsHeaderContainer = document.getElementById('hotels-container');
-var hotelsBodyContainer = document.getElementById('hotels');
+
 var hotelSearchLocationElement = document.getElementById('cityHotel');
 var hotelSearchForm = document.getElementById('hotel-search-form');
 var hotelSearchButton = document.getElementById('hotel-search-button');
 var hotelSearchBox = document.getElementById('hotel-search-box');
 var hotelSearchIcon = document.getElementById('hotel-search-icon');
-var mapContainer = document.getElementById('map-container');
+
+var hotelsHeaderContainer = document.getElementById('hotels-header');
+var hotelsBodyContainer = document.getElementById('hotels-container');
 
 var apiKey = '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb';
 var apiHost = 'hotels-com-provider.p.rapidapi.com';
 
 var numberOfHotelsToDisplay = 8;
+
+var map;
+var mapContainer;
 
 var apiOptions = {
   method: 'GET',
@@ -74,13 +78,19 @@ function saveObjectToLocalStorage(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-async function searchLocationForHotels(options = {}) {
+async function searchLocationForHotels(options = {}, overrideLocation) {
   // if script is already processing a previous request, prevent a new request from being processed
   if (loading === true) {
     return;
   }
 
+  if (overrideLocation !== undefined) {
+    hotelSearchBox.value = overrideLocation;
+  }
+
   var locationName = hotelSearchBox.value;
+
+  hotelSearchBox.blur();
 
   putPageIntoLoadingState();
   emptyHotelContainers();
@@ -238,20 +248,205 @@ function addHotelsToLocalStorage(regionId, hotels, options) {
   console.log(`Saved hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} to local storage.`)
 }
 
-function renderHotels(regionName, hotels, numberOfHotelsToDisplay) {
+function renderHotels(regionName, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplay) {
   emptyHotelContainers();
 
   var hotelContainerHeader = createHotelContainerHeader(regionName);
   $(hotelSearchLocationElement).append(hotelContainerHeader);
 
-  for (var i = 0; i < numberOfHotelsToDisplay; ++i) {
-    var hotelCard = createHotelCard(hotels[i]);
+  createHotelGrid(hotels);
+}
 
-    $(hotelsBodyContainer).append(hotelCard);
+function createHotelGrid(hotels, columns = 4) {
+  hotelsBodyContainer.style.gridTemplateAreas = createGridTemplateAreasString(hotels, columns);
+  // hotelsBodyContainer.style.gridTemplateColumns = createGridTemplateColumnsString(columns);
+
+  createMapContainer();
+  hotelsBodyContainer.appendChild(mapContainer);
+
+  for (var i = 0; i < hotels.length; ++i) {
+    var hotelCard = createHotelCard(hotels[i], i);
+    hotelsBodyContainer.appendChild(hotelCard);
   }
 }
 
-function createHotelCard(hotel) {
+function createGridTemplateAreasString(hotels, columns) {
+  var gridTemplateAreas = [];
+  var mapColumnSpan = 2;
+  var mapRowSpan = 3;
+
+  var hotelIndex = 0;
+
+  for (var i = 0; i < mapRowSpan; ++i) { // create a square space spanning mapSpan x mapSpan rows and columns in the top right of the grid
+    var templateRow = [];
+    for (var j = 0; j < columns; ++j) {
+      if (j >= columns - mapColumnSpan) {
+        templateRow.push('map');
+      } else if (hotelIndex >= hotels.length) {
+        templateRow.push('.');
+      } else {
+        templateRow.push(`hotel-${hotelIndex}`);
+        templateRow.push(`hotel-${hotelIndex}`);
+
+        hotelIndex += 1;
+        ++j;
+      }
+    }
+
+    gridTemplateAreas.push(templateRow);
+  }
+
+  while (hotelIndex < hotels.length) { // fill the rest of the grid with remaining hotels that need to be rendered
+    var templateRow = [];
+
+    for (var i = 0; i < columns / 2; ++i) {
+      if (hotelIndex + i < hotels.length) {
+        templateRow.push(`hotel-${hotelIndex + i}`);
+        templateRow.push(`hotel-${hotelIndex + i}`);
+      } else {
+        templateRow.push('.');
+        templateRow.push('.');
+      }
+    }
+
+    gridTemplateAreas.push(templateRow);
+
+    hotelIndex += columns / 2;
+  }
+
+  var gridTemplateAreasString = '';
+
+  for (var i = 0; i < gridTemplateAreas.length; ++i) {
+    gridTemplateAreasString += `"${gridTemplateAreas[i].join(' ')}"`;
+
+    if (i !== gridTemplateAreas.length - 1) {
+      gridTemplateAreasString += '\n';
+    }
+  }
+  console.log(gridTemplateAreasString);
+  return gridTemplateAreasString;
+}
+
+function createGridTemplateColumnsString(columns) {
+  var gridTemplateColumnsString = '';
+
+  for (var i = 0; i < columns; ++i) {
+    gridTemplateColumnsString += '1fr ';
+  }
+
+  return gridTemplateColumnsString.trim();
+}
+
+var flag = true;
+var flag2 = true;
+
+function createHotelCard(hotel, index) {
+  if (flag) {
+    console.log(hotel);
+    flag = false;
+  }
+
+  if (flag2 && hotel.star !== null) {
+    console.log(hotel);
+    flag2 = false;
+  }
+
+  var hotelCard = document.createElement('div');
+  hotelCard.classList.add('hotel-card');
+  hotelCard.style.gridArea = `hotel-${index}`;
+
+  var hotelCardImageHolder = document.createElement('div');
+  hotelCardImageHolder.classList.add('hotel-card-image-holder');
+  hotelCardImageHolder.style.backgroundImage = `url(${hotel.propertyImage.image.url})`;
+
+  var hotelCardBody = document.createElement('div');
+  hotelCardBody.classList.add('hotel-card-body');
+
+  var hotelCardTop = document.createElement('div');
+  hotelCardTop.classList.add('hotel-card-top');
+
+  var hotelCardBottom = document.createElement('div');
+  hotelCardBottom.classList.add('hotel-card-bottom');
+
+  var hotelCardBottomLeft = document.createElement('div');
+  hotelCardBottomLeft.classList.add('hotel-card-bottom-left');
+
+  var hotelCardBottomMiddle = document.createElement('div');
+  hotelCardBottomMiddle.classList.add('hotel-card-bottom-middle');
+
+  var hotelCardBottomRight = document.createElement('div');
+  hotelCardBottomRight.classList.add('hotel-card-bottom-right');
+
+  var hotelCardlName = document.createElement('div');
+  hotelCardlName.classList.add('hotel-card-name');
+  hotelCardlName.textContent = hotel.name;
+
+  var hotelCardLocation = document.createElement('div');
+  hotelCardLocation.classList.add('hotel-card-location');
+  hotelCardLocation.textContent = hotel.neighborhood.name;
+
+  var hotelCardRating = document.createElement('div');
+  hotelCardRating.classList.add('hotel-card-rating');
+
+  var hotelCardRatingNumber = document.createElement('div');
+  hotelCardRatingNumber.classList.add('hotel-card-rating-number');
+  hotelCardRatingNumber.textContent = hotel.reviews.score.toFixed(1);
+
+  var hotelCardRatingOutOfText = document.createElement('div');
+  hotelCardRatingOutOfText.classList.add('hotel-card-rating-out-of-text');
+  hotelCardRatingOutOfText.textContent = '/';
+
+  var hotelCardRatingOutOfNumber = document.createElement('div');
+  hotelCardRatingOutOfNumber.classList.add('hotel-card-rating-out-of-number');
+  hotelCardRatingOutOfNumber.textContent = '10';
+
+  var hotelCardReviewsNumber = document.createElement('div');
+  hotelCardReviewsNumber.classList.add('hotel-card-reviews-number');
+  hotelCardReviewsNumber.textContent = `${hotel.reviews.total} Reviews`;
+
+  var hotelCardPrice = document.createElement('div');
+  hotelCardPrice.classList.add('hotel-card-price');
+
+  var hotelCardPriceAmount = document.createElement('div');
+  hotelCardPriceAmount.classList.add('hotel-card-price-amount');
+  hotelCardPriceAmount.textContent = hotel.price.lead.amount.toFixed(2);
+
+  var hotelCardPriceCurrency = document.createElement('div');
+  hotelCardPriceCurrency.classList.add('hotel-card-price-currency');
+  hotelCardPrice.textContent = hotel.price.lead.currencyInfo.symbol;
+
+  var hotelCardPriceUnit = document.createElement('div');
+  hotelCardPriceUnit.classList.add('hotel-card-price-unit');
+  hotelCardPriceUnit.textContent = hotel.price.priceMessages[0].value;
+
+  hotelCard.appendChild(hotelCardImageHolder);
+  hotelCard.appendChild(hotelCardBody);
+
+  hotelCardBody.appendChild(hotelCardTop);
+  hotelCardBody.appendChild(hotelCardBottom);
+
+  hotelCardTop.appendChild(hotelCardlName);
+  hotelCardTop.appendChild(hotelCardLocation);
+
+  hotelCardBottom.append(hotelCardBottomLeft);
+  hotelCardBottom.append(hotelCardBottomMiddle);
+  hotelCardBottom.append(hotelCardBottomRight);
+
+  hotelCardBottomLeft.appendChild(hotelCardPrice);
+  hotelCardBottomLeft.appendChild(hotelCardPriceUnit);
+
+  hotelCardBottomRight.appendChild(hotelCardRating);
+  hotelCardBottomRight.appendChild(hotelCardReviewsNumber);
+
+  hotelCardRating.appendChild(hotelCardRatingNumber);
+  hotelCardRating.appendChild(hotelCardRatingOutOfText);
+  hotelCardRating.appendChild(hotelCardRatingOutOfNumber);
+
+  hotelCardPrice.appendChild(hotelCardPriceCurrency);
+  hotelCardPrice.appendChild(hotelCardPriceAmount);
+
+  return hotelCard;
+
   var hotelContainer = $("<div>").addClass("box");
 
   var hotelTitle = $("<h5>");
@@ -278,6 +473,19 @@ function createHotelContainerHeader(regionName) {
   return hotelHeader;
 }
 
+function createMapContainer() {
+  mapContainer = document.createElement('div');
+  mapContainer.setAttribute('id', 'map-container');
+  mapContainer.classList.add('d-none');
+  mapContainer.style.gridArea = 'map';
+
+  var mapElement = document.createElement('div');
+  mapElement.setAttribute('id', 'map');
+  mapContainer.appendChild(mapElement);
+
+  return mapContainer;
+}
+
 function putPageIntoLoadingState() {
   showElement(loadingSpinnerContainer);
   hideElement(hotelSearchIcon);
@@ -285,7 +493,6 @@ function putPageIntoLoadingState() {
   hideElement(hotelsBodyContainer);
   hotelSearchButton.disabled = true;
   hideElement(mapContainer);
-  clearSearchBar();
 
   loading = true;
 }
@@ -297,6 +504,7 @@ function takePageOutOfLoadingState() {
   showElement(hotelsBodyContainer);
   hotelSearchButton.disabled = false;
   showElement(mapContainer);
+  // clearSearchBar();
 
   dockJumbotron();
 
@@ -304,14 +512,26 @@ function takePageOutOfLoadingState() {
 }
 
 function hideElement(element) {
+  if (element === undefined) {
+    return;
+  }
+
   element.classList.add('d-none');
 }
 
 function showElement(element) {
+  if (element === undefined) {
+    return;
+  }
+
   element.classList.remove('d-none');
 }
 
 function emptyElement(element) {
+  if (element === undefined) {
+    return;
+  }
+
   element.innerHTML = '';
 }
 
@@ -394,11 +614,14 @@ $(".dropdown-item").on("click", function (event) {
   searchLocationForHotels({ sortOrder });
 });
 
+window.addEventListener('load', function () {
+  hotelSearchBox.focus();
+  searchLocationForHotels({}, 'London');
+});
+
 /* Maps functionality Start */
 
 var mapMarkers = [];
-
-var map;
 
 function updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplay) {
   var slicedHotels = hotels.slice(0, numberOfHotelsToDisplay);
@@ -454,6 +677,7 @@ function resetMap() {
     map.off();
     map.remove();
   }
+
   map = L.map('map').setView([51.05, -0.09], 13);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -462,3 +686,4 @@ function resetMap() {
 }
 
 /* Maps functionality End */
+
