@@ -752,7 +752,7 @@ function resetMap() {
 
 /* Maps functionality End */
 
-/* Weather functionality Start */
+/* Weather functionality Start */ /*
 
 var apiKey = '60138034af71780e3420402cea540efb';
 
