@@ -1,11 +1,15 @@
 var loading = false;
+var jumbotronDocked = false;
 
 var loadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
+var jumbotronContainer = document.getElementById('jumbotron-container');
+var jumbotron = document.getElementById('jumbotron');
 var hotelsHeaderContainer = document.getElementById('hotels-container');
 var hotelsBodyContainer = document.getElementById('hotels');
 var hotelSearchLocationElement = document.getElementById('cityHotel');
-var searchForm = document.getElementById('surroundBox');
-var searchButton = document.getElementById('searchBtn');
+var hotelSearchForm = document.getElementById('hotel-search-form');
+var hotelSearchButton = document.getElementById('hotel-search-button');
+var hotelSearchBox = document.getElementById('hotel-search-box');
 var searchLoadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
 var mapContainer = document.getElementById('map-container');
 
@@ -33,7 +37,6 @@ var regionsData = {}; // { regionId: [{id, name}]}
 var hotelsData = {}; // { regionId: [hotel+options] }
 
 loadDataFromLocalStorage();
-console.log(hotelsData)
 
 function loadDataFromLocalStorage() {
   var localStorageSearchTerms = localStorage.getItem('searchTerms');
@@ -77,7 +80,7 @@ async function searchLocationForHotels(options = {}) {
     return;
   }
 
-  var locationName = $('#searchBox').val();
+  var locationName = hotelSearchBox.value;
 
   putPageIntoLoadingState();
   emptyHotelContainers();
@@ -277,8 +280,9 @@ function putPageIntoLoadingState() {
   showElement(loadingSpinnerContainer);
   hideElement(hotelsHeaderContainer);
   hideElement(hotelsBodyContainer);
-  searchButton.disabled = true;
+  hotelSearchButton.disabled = true;
   hideElement(mapContainer);
+  clearSearchBar();
 
   scrollToElement(searchLoadingSpinnerContainer);
 
@@ -289,8 +293,10 @@ function takePageOutOfLoadingState() {
   hideElement(loadingSpinnerContainer);
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
-  searchButton.disabled = false;
+  hotelSearchButton.disabled = false;
   showElement(mapContainer);
+
+  dockJumbotron();
 
   loading = false;
 }
@@ -314,6 +320,7 @@ function emptyHotelContainers() {
 }
 
 function scrollToElement(element) {
+  return;
   // turn off smooth scroll which interacts weirdly with scrollTop
   document.documentElement.style.setProperty('scroll-behavior', 'auto', 'important');
 
@@ -328,6 +335,22 @@ function scrollToElement(element) {
 function createHotelsSearchKey(regionId, options) {
   var optionsAsSortedArrayToJSONString = convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(options);
   return `${regionId}${optionsAsSortedArrayToJSONString}`;
+}
+
+function clearSearchBar() {
+  hotelSearchBox.value = '';
+}
+
+function dockJumbotron() {
+  if (jumbotronDocked) {
+    return;
+  }
+
+  jumbotronDocked = true;
+  jumbotron.classList.add('docked-jumbotron');
+
+  hotelSearchForm.classList.add('docked-hotel-search-form');
+  hotelSearchForm.classList.remove('col-md-8');
 }
 
 function convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(object) {
@@ -345,7 +368,7 @@ function convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(object) {
   return JSON.stringify(objectAsSortedArray);
 }
 
-$(searchForm).on('submit', function (event) {
+$(hotelSearchForm).on('submit', function (event) {
   event.preventDefault();
   searchLocationForHotels();
 });

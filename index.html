@@ -20,7 +20,7 @@
 
 <body>
   <!-- Start navigation bar -->
-  <nav class="navbar navbar-expand-lg bg-body-tertiary customNav" data-bs-theme="light">
+  <nav id="main-nav" class="navbar navbar-expand-lg bg-body-tertiary customNav" data-bs-theme="light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">TRAVEL APP </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
@@ -68,15 +68,19 @@
 
 
   <!-- // jumbotron and search -->
-  <div class="jumbotron">
-    <hr class="my-4">
-
-    <form id="surroundBox">
-      <h1> Where would you like to go? </h1>
-      <input type="text" id="searchBox" placeholder="Enter a city ">
-
-      <button type="submit" class="btn btn-primary btn-lg" role="button" id="searchBtn">SEARCH</button>
-    </form>
+  <div id="jumbotron-container" class="jumbotron-container">
+    <div id="jumbotron" class="jumbotron container-fluid d-flex justify-content-center align-items-center">
+      <h1 class="jumbotron-heading d-none"><strong>Where would you like to go?</strong></h1>
+      <form id="hotel-search-form" autocomplete="off" class="col-12 col-md-8">
+        <div class="input-group position-relative">
+          <input type="text" id="hotel-search-box" class="form-control position-relative fs-4 ps-3 ps-md-5 z-1"
+            placeholder="Where would you like to go?">
+          <button type="submit" id="hotel-search-button"
+            class="btn btn-lg position-absolute top-50 end-0 translate-middle-y z-2" role="button"><i id="search-icon"
+              class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+      </form>
+    </div>
   </div>
   <!-- // jumbotron and search -->
 
