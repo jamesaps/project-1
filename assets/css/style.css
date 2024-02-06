@@ -92,7 +92,7 @@
 
 @media (min-width: 992px) {
     #hotel-search-box {
-        height: 100px;
+        height: 105px;
     }
 }
 
@@ -115,13 +115,24 @@
     transition: width 1s;
 }
 
+@media screen and (min-width: 992px) {
+    #hotel-search-button {
+        margin-right: 25px;
+    }
+}
+
+.docked-hotel-search-form #hotel-search-button {
+    margin-right: 10px;
+    transition: margin-right 1s;
+}
+
 /* Hover & Transition */
 a:hover {
     color: rgb(76, 146, 187) !important;
 }
 
 /* Responsive styles */
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     .navbar-nav .nav-link {
         margin-right: 0.5rem;
     }
@@ -255,6 +266,16 @@ h5 {
 
 /* Loading spinner */
 #hotel-search-loading-spinner-container {
+    margin-right: 22px;
+}
+
+@media screen and (min-width: 992px) {
+    #hotel-search-loading-spinner-container {
+        margin-right: 37px;
+    }
+}
+
+.docked-hotel-search-form #hotel-search-loading-spinner-container {
     margin-right: 22px;
 }
 
