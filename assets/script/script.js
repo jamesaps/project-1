@@ -14,7 +14,7 @@ var hotelSearchIcon = document.getElementById('hotel-search-icon');
 var hotelsHeaderContainer = document.getElementById('hotels-header-container');
 var hotelsBodyContainer = document.getElementById('hotels-container');
 
-var apiKey = '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb';
+var apiKey = '37a742acecmshb1d0cea778ef597p1c03a8jsn8195f29d98b6';
 var apiHost = 'hotels-com-provider.p.rapidapi.com';
 
 var numberOfHotelsToDisplay = 8;
@@ -751,3 +751,124 @@ function resetMap() {
 }
 
 /* Maps functionality End */
+
+/* Weather functionality Start */
+
+var apiKey = '60138034af71780e3420402cea540efb';
+
+var geoApiURLPrefix = 'https://api.openweathermap.org/geo/1.0/direct?';
+var currentWeatherApiURLPrefix = 'https://api.openweathermap.org/data/2.5/weather?';
+var forecastWeatherApiURLPrefix = 'https://api.openweathermap.org/data/2.5/forecast?';
+
+var weatherApiError = ''; // non empty string when an api error occurs - globally scoped because it is accessed in numerous closures
+
+async function getLatAndLonByLocationName(location) {
+  // instantiate return object
+  var coordinates = {};
+
+  // create query string portion of URL from user input
+  var queryString = `q=${location}`;
+  // create App ID portion of URL using API key
+  var appId = `appid=${apiKey}`;
+
+  // construct url using components above
+  var url = geoApiURLPrefix + [queryString, appId].join('&');
+
+  // Attempt to perform fetch request on URL. If this returns a 404, despite being caught, Google Chrome will display this error in the browser
+
+  var response = await fetch(url);
+
+  if (!response.ok) {
+    updateApiError('An API Error occurred. Please try again later.');
+    throw new Error(response.statusText);
+  }
+
+  var locations = await response.json();
+
+  if (locations.length === 0) {
+    updateApiError('Location not found.');
+    throw new Error(`Location ${location} was not recognised.`);
+  }
+
+  var { name, lat, lon } = locations[0];
+
+  coordinates.name = name;
+  coordinates.lat = lat;
+  coordinates.lon = lon;
+
+  return coordinates;
+}
+
+async function getCurrentWeatherData(coordinates) {
+  // instantiate current weather data return object
+  var currentWeatherData = {};
+
+  // construct url using user provided latitude and longitude
+  var url = currentWeatherApiURLPrefix + `lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}`;
+
+  var response = await fetch(url);
+
+  if (!response.ok) {
+    updateApiError('An API Error occurred. Please try again later.');
+    throw new Error(response.statusText);
+  }
+
+  var weatherData = await response.json();
+
+  // offset date to show weather-local timezone despite dayjs being configured to user-local timezone
+  var date = dayjs(weatherData.dt * 1000 + weatherData.timezone * 1000 + timezoneOffset * 60 * 1000);
+
+  currentWeatherData.location = coordinates.name;
+  currentWeatherData.date = date;
+  currentWeatherData.temperature = convertTemperatureInKtoC(weatherData.main.temp).toFixed(2); // API returns weather in Kelvin so we convert to Celsius using a helper function before returning
+  currentWeatherData.wind = convertMpsToKph(weatherData.wind.speed).toFixed(2); // API returns m/s so we convert to kph first
+  currentWeatherData.humidity = weatherData.main.humidity;
+  currentWeatherData.weatherIcons = weatherData.weather.map(condition => condition.icon);
+
+  return currentWeatherData;
+}
+
+function getLocationCoordinatesFromLocalStorage(location) {
+  var locationTrimmedToLowerCase = location.trim().toLowerCase();
+  renderPreviouslySearchedLocations();
+
+  var coordinates = localStorageCoordinates.find((element) => element.trimmedName === locationTrimmedToLowerCase);
+
+  // Move coordinates to end of the storage so they appear first in history list even
+  if (coordinates !== undefined) {
+    localStorageCoordinates = localStorageCoordinates.filter(element => element.trimmedName !== locationTrimmedToLowerCase);
+
+    localStorageCoordinates.push(coordinates);
+    saveLocationCoordinatesToLocalStorage();
+  }
+
+  return coordinates;
+}
+
+function addLocationCoordinatesToLocalStorage(location, coordinates) {
+  var locationTrimmedToLowerCase = location.trim().toLowerCase();
+
+  if (getLocationCoordinatesFromLocalStorage(location) !== undefined) {
+    return;
+  }
+
+  coordinates.trimmedName = locationTrimmedToLowerCase;
+
+  localStorageCoordinates.push(coordinates);
+  saveLocationCoordinatesToLocalStorage();
+}
+
+function saveLocationCoordinatesToLocalStorage() {
+  var localStorageCoordinatesStringified = JSON.stringify(localStorageCoordinates);
+
+  localStorage.setItem('coordinates', localStorageCoordinatesStringified);
+  renderPreviouslySearchedLocations();
+}
+
+function updateWeatherApiError(newError) {
+  if (weatherApiError === '') {
+    weatherApiError = newError;
+  }
+}
+
+/* Weather functionality End */
