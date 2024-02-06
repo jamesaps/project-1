@@ -82,7 +82,7 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
   // if script is already processing a previous request, prevent a new request from being processed
   if (loading === true) {
     return;
-  }
+  } apiOptions.headers['X-RapidAPI-Key'] = '37a742acecmshb1d0cea778ef597p1c03a8jsn8195f29d98b6'
 
   if (overrideLocation !== undefined) {
     hotelSearchBox.value = overrideLocation;
@@ -449,7 +449,10 @@ function createHotelCard(hotel, index) {
 
   var hotelCardLocation = document.createElement('div');
   hotelCardLocation.classList.add('hotel-card-location');
-  hotelCardLocation.textContent = hotel.neighborhood.name;
+
+  if (hotel.neighborhood) {
+    hotelCardLocation.textContent = hotel.neighborhood.name;
+  }
 
   var hotelCardRating = document.createElement('div');
   hotelCardRating.classList.add('hotel-card-rating');
@@ -475,7 +478,9 @@ function createHotelCard(hotel, index) {
 
   var hotelCardPriceAmount = document.createElement('div');
   hotelCardPriceAmount.classList.add('hotel-card-price-amount');
-  hotelCardPriceAmount.textContent = hotel.price.lead.amount.toFixed(2);
+  if (hotel.price && hotel.price.lead && hotel.price.lead.amount) {
+    hotelCardPriceAmount.textContent = hotel.price.lead.amount.toFixed(2);
+  }
 
   var hotelCardPriceCurrency = document.createElement('div');
   hotelCardPriceCurrency.classList.add('hotel-card-price-currency');
@@ -483,7 +488,9 @@ function createHotelCard(hotel, index) {
 
   var hotelCardPriceUnit = document.createElement('div');
   hotelCardPriceUnit.classList.add('hotel-card-price-unit');
-  hotelCardPriceUnit.textContent = hotel.price.priceMessages[0].value;
+  if (hotel.price && hotel.price.priceMessages && hotel.price.priceMessages[0]) {
+    hotelCardPriceUnit.textContent = hotel.price.priceMessages[0].value;
+  }
 
   hotelCard.appendChild(hotelCardImageHolder);
   hotelCard.appendChild(hotelCardBody);
