@@ -4,18 +4,15 @@
 
 /* NavBar styling */
 #main-nav {
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin: 10px;
+    margin-bottom: 0;
     border-radius: 10px;
+    min-height: 91px;
     background-color: peachpuff !important;
 }
 
 @media screen and (min-width: 768px) {
-    #main-nav {
-        /* margin-left: 50px;
-        margin-right: 50px; */
-    }
+    #main-nav {}
 }
 
 .navbar-nav {
@@ -45,7 +42,7 @@
     background-image: url(../images/sean-oulashin-KMn4VEeEPR8-unsplash.jpg);
     background-size: cover;
     border-radius: 10px;
-    height: 95px;
+    height: calc(100vh - 101px - 20px);
     background-position: center;
     transition: justify-content 1s;
 }
@@ -62,7 +59,7 @@
 
     .jumbotron {
         background-position: top;
-        height: calc(100vh - 72px - 60px);
+        height: calc(100vh - 101px - 20px);
     }
 }
 
