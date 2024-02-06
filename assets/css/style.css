@@ -3,11 +3,28 @@
 }
 
 /* NavBar styling */
+#main-nav {
+    margin: 10px;
+    margin-bottom: 0;
+    border-radius: 10px;
+    min-height: 91px;
+    background-color: peachpuff !important;
+}
+
+@media screen and (min-width: 768px) {
+    #main-nav {}
+}
+
 .navbar-nav {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 75px;
+}
+
+.navbar-brand {
+    margin-left: 15px;
 }
 
 .nav-item {
@@ -15,53 +32,75 @@
     font-size: 14px;
 }
 
-/* Jumbo and surround box  */
+/* Jumbotron  */
+
+.jumbotron-container {
+    padding: 10px;
+}
 
 .jumbotron {
     background-image: url(../images/sean-oulashin-KMn4VEeEPR8-unsplash.jpg);
     background-size: cover;
-    height: calc(100vh - 25px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 50px;
-}
-
-#searchBox {
-    width: 350px;
-    height: 50px;
     border-radius: 10px;
-    background-color: white;
-    color: black;
-    margin-top: 30px;
-    padding-left: 10px;
+    height: calc(100vh - 101px - 20px);
+    background-position: center;
+    transition: justify-content 1s;
 }
 
-#searchBtn {
-    background-color: rgb(44, 123, 168);
-    height: 50px;
-    border-radius: 10px;
-    background-color: black;
-    border-color: black;
+.docked-jumbotron {
+    transition: height 1s, background-position 1s;
 }
 
+@media screen and (min-width: 768px) {
+    .jumbotron-container {
+        /* padding: 50px;
+        padding-top: 10px; */
+    }
 
-h1 {
-    font-size: 30px;
-    text-align: center;
-}
-
-@media screen and (max-width: 768px) {
     .jumbotron {
-        height: auto;
-        padding: 20px;
-        margin: 20px;
+        background-position: top;
+        height: calc(100vh - 101px - 20px);
     }
+}
 
-    #searchBox {
-        width: 100%;
-        margin-top: 20px;
-    }
+.docked-jumbotron {
+    height: 95px;
+}
+
+.jumbotron-heading {}
+
+#hotel-search-box {
+    height: 75px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(0, 0, 0, 0.8);
+    color: rgba(0, 0, 0, 0.8);
+}
+
+#hotel-search-box:focus {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#hotel-search-box:focus::placeholder {
+    color: white;
+}
+
+#hotel-search-box::placeholder {
+    color: black;
+}
+
+.docked-hotel-search-form {
+    transition: width 1s;
+}
+
+#hotel-search-button {
+    height: 55px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    margin-right: 10px;
+    color: white;
+    transition: width 1s;
 }
 
 /* Hover & Transition */
@@ -76,7 +115,7 @@ a:hover {
     }
 }
 
-
+/* Footer Start */
 .footer {
     background-color: rgb(244, 242, 241);
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -101,6 +140,7 @@ a:hover {
 }
 
 #newsletter-container {
+    padding-left: 20px;
     background-color: rgb(249, 248, 247);
 }
 
@@ -128,6 +168,8 @@ a:hover {
 .fa-stack {
     margin-bottom: 5px;
 }
+
+/* Footer End */
 
 .box {
     display: flex;
@@ -193,13 +235,44 @@ h5 {
     margin-left: 50px;
 }
 
+@media screen and (max-width: 768px) {
+    #dropDown {
+        margin-left: 20px;
+    }
+}
+
 /* Loading spinner */
 #hotel-search-loading-spinner-container {
-    margin-bottom: 50px;
+    margin-bottom: 20px;
+}
+
+
+@media screen and (min-width: 768px) {
+    #hotel-search-loading-spinner-container {
+        margin-bottom: 50px;
+    }
+}
+
+/* Map start */
+
+.map-container {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+#map {
+    height: 600px;
 }
 
 @media screen and (max-width: 768px) {
-    #hotel-search-loading-spinner-container {
-        margin-bottom: 20px;
+    .map-container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    #map {
+        height: 400px;
     }
 }
+
+/* Map end */
