@@ -682,7 +682,7 @@ $(".dropdown-item").on("click", function (event) {
 
 window.addEventListener('load', function () {
   hotelSearchBox.focus();
-  searchLocationForHotels({}, 'London');
+  // searchLocationForHotels({}, 'London');
 });
 
 /* Maps functionality Start */
