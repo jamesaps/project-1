@@ -5,13 +5,13 @@ var loadingSpinnerContainer = document.getElementById('hotel-search-loading-spin
 var jumbotronContainer = document.getElementById('jumbotron-container');
 var jumbotron = document.getElementById('jumbotron');
 
-var hotelSearchLocationElement = document.getElementById('cityHotel');
+var hotelSearchLocationElement = document.getElementById('hotels-location');
 var hotelSearchForm = document.getElementById('hotel-search-form');
 var hotelSearchButton = document.getElementById('hotel-search-button');
 var hotelSearchBox = document.getElementById('hotel-search-box');
 var hotelSearchIcon = document.getElementById('hotel-search-icon');
 
-var hotelsHeaderContainer = document.getElementById('hotels-header');
+var hotelsHeaderContainer = document.getElementById('hotels-header-container');
 var hotelsBodyContainer = document.getElementById('hotels-container');
 
 var apiKey = '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb';
@@ -258,8 +258,8 @@ function renderHotels(regionName, hotels, numberOfHotelsToDisplay = numberOfHote
 }
 
 function createHotelGrid(hotels, columns = 4) {
-  hotelsBodyContainer.style.gridTemplateAreas = createGridTemplateAreasString(hotels, columns);
-  // hotelsBodyContainer.style.gridTemplateColumns = createGridTemplateColumnsString(columns);
+  createGridTemplateAreasString(hotels, columns);
+  hotelsBodyContainer.style.gridTemplateColumns = createGridTemplateColumnsString(columns);
 
   createMapContainer();
   hotelsBodyContainer.appendChild(mapContainer);
@@ -272,13 +272,21 @@ function createHotelGrid(hotels, columns = 4) {
 
 function createGridTemplateAreasString(hotels, columns) {
   var gridTemplateAreas = [];
+  var gridTemplateAreasSmallerScreens = [];
   var mapColumnSpan = 2;
   var mapRowSpan = 3;
 
   var hotelIndex = 0;
+  var hotelIndexSmallScreen = 0;
 
   for (var i = 0; i < mapRowSpan; ++i) { // create a square space spanning mapSpan x mapSpan rows and columns in the top right of the grid
     var templateRow = [];
+    var templateRowSmallScreen = [];
+
+    for (var j = 0; j < columns; ++j) {
+      templateRowSmallScreen.push('map');
+    }
+
     for (var j = 0; j < columns; ++j) {
       if (j >= columns - mapColumnSpan) {
         templateRow.push('map');
@@ -294,6 +302,22 @@ function createGridTemplateAreasString(hotels, columns) {
     }
 
     gridTemplateAreas.push(templateRow);
+    gridTemplateAreasSmallerScreens.push(templateRowSmallScreen);
+  }
+
+  while (hotelIndexSmallScreen < hotels.length) {
+    var templateRowSmallScreen = [];
+
+    if (hotelIndexSmallScreen < hotels.length) {
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+
+      gridTemplateAreasSmallerScreens.push(templateRowSmallScreen);
+    }
+
+    hotelIndexSmallScreen += 1;
   }
 
   while (hotelIndex < hotels.length) { // fill the rest of the grid with remaining hotels that need to be rendered
@@ -323,7 +347,49 @@ function createGridTemplateAreasString(hotels, columns) {
       gridTemplateAreasString += '\n';
     }
   }
+
+  console.log(gridTemplateAreasSmallerScreens.slice(0, 5))
+
+  var gridTemplateAreasString = createGridTemplateAreasStringFromGridTemplateAreas(gridTemplateAreas);
+  var gridTemplateAreasSmallerScreensString = createGridTemplateAreasStringFromGridTemplateAreas(gridTemplateAreasSmallerScreens);
+
   console.log(gridTemplateAreasString);
+
+  // Add the grid template areas styles to the document head because media queries cannot be applied inline
+
+  var css = `
+    #hotels-container {
+      grid-template-areas: ${gridTemplateAreasSmallerScreensString};
+    }
+
+    @media screen and (min-width: 992px) {
+      #hotels-container {
+        grid-template-areas: ${gridTemplateAreasString};
+      }
+    }
+  `;
+
+  let style = document.getElementById('hotel-grid-styles');
+  if (!style) {
+    style = document.createElement('style');
+    style.setAttribute('id', 'hotel-grid-styles');
+    document.head.appendChild(style);
+  }
+
+  style.innerHTML = css;
+}
+
+function createGridTemplateAreasStringFromGridTemplateAreas(gridTemplateAreas) {
+  var gridTemplateAreasString = '';
+
+  for (var i = 0; i < gridTemplateAreas.length; ++i) {
+    gridTemplateAreasString += `"${gridTemplateAreas[i].join(' ')}"`;
+
+    if (i !== gridTemplateAreas.length - 1) {
+      gridTemplateAreasString += '\n';
+    }
+  }
+
   return gridTemplateAreasString;
 }
 
@@ -657,7 +723,6 @@ function createMapMarker(hotel) {
   marker.bindPopup(popup);
   marker.on('click', function (e) {
     var popup = e.target.getPopup();
-
   })
 }
 
@@ -686,4 +751,3 @@ function resetMap() {
 }
 
 /* Maps functionality End */
-

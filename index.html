@@ -93,25 +93,18 @@
   <!-- // jumbotron and search -->
 
   <!-- Hotels cards  -->
-  <div id="hotels-header" class="container-fluid d-none">
-    <div class="row" id="cityHotel"></div>
-    <div class="row justify-content-start">
-      <div class="col-12">
-        <div class="dropdown" id="dropDown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            FILTER
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            <li><a class="dropdown-item" id="item1" data-index="REVIEW">REVIEW</a></li>
-            <li><a class="dropdown-item" id="item2" data-index="RECOMMENDED">RECOMMENDED</a></li>
-            <li><a class="dropdown-item" id="item3" data-index="DISTANCE">DISTANCE</a></li>
-          </ul>
-        </div>
+  <div id="hotels-header-container" class="d-none">
+    <div id="hotels-header" class="container-fluid ">
+      <div class="row h-100 align-items-center justify-content-between text-center">
+        <div class="col-12 col-md-4">1</div>
+        <div class="col-12 col-md-4" id="hotels-location"></div>
+        <div class="col-12 col-md-4">3</div>
       </div>
     </div>
   </div>
-  <div id="hotels-container" class="container-fluid"></div>
+  </div>
+
+  <div id="hotels-container" class="container-fluid d-none"></div>
   <!-- <div id="map-container" class="container-fluid map-container d-none">
     <div id="map"></div>
   </div> -->
@@ -203,7 +196,7 @@
     integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <script src="./assets/script/script.js"> </script>
+  <script src="./assets/script/script.js"></script>
 </body>
 
 </html>
