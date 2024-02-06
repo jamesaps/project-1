@@ -10,7 +10,7 @@ var hotelSearchLocationElement = document.getElementById('cityHotel');
 var hotelSearchForm = document.getElementById('hotel-search-form');
 var hotelSearchButton = document.getElementById('hotel-search-button');
 var hotelSearchBox = document.getElementById('hotel-search-box');
-var searchLoadingSpinnerContainer = document.getElementById('hotel-search-loading-spinner-container');
+var hotelSearchIcon = document.getElementById('hotel-search-icon');
 var mapContainer = document.getElementById('map-container');
 
 var apiKey = '494e568795mshdacbfaf47fa8edep12317cjsn74147600f8bb';
@@ -84,6 +84,8 @@ async function searchLocationForHotels(options = {}) {
 
   putPageIntoLoadingState();
   emptyHotelContainers();
+
+  await simulateNetworkCall();
 
   var regionDetails = await getRegionDetailsByLocationName(locationName);
   var hotels = await getHotelsByRegionId(regionDetails.id, options);
@@ -278,19 +280,19 @@ function createHotelContainerHeader(regionName) {
 
 function putPageIntoLoadingState() {
   showElement(loadingSpinnerContainer);
+  hideElement(hotelSearchIcon);
   hideElement(hotelsHeaderContainer);
   hideElement(hotelsBodyContainer);
   hotelSearchButton.disabled = true;
   hideElement(mapContainer);
   clearSearchBar();
 
-  scrollToElement(searchLoadingSpinnerContainer);
-
   loading = true;
 }
 
 function takePageOutOfLoadingState() {
   hideElement(loadingSpinnerContainer);
+  showElement(hotelSearchIcon);
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
   hotelSearchButton.disabled = false;
@@ -366,6 +368,16 @@ function convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(object) {
   });
 
   return JSON.stringify(objectAsSortedArray);
+}
+
+async function simulateNetworkCall() {
+  return new Promise(resolve => setTimeout(resolve, getRandomInt(500, 2000)));
+}
+
+function getRandomInt(min, max) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
 }
 
 $(hotelSearchForm).on('submit', function (event) {

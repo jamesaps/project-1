@@ -90,12 +90,24 @@
     color: black;
 }
 
+@media (min-width: 992px) {
+    #hotel-search-box {
+        height: 100px;
+    }
+}
+
 .docked-hotel-search-form {
     transition: width 1s;
 }
 
+.docked-hotel-search-form #hotel-search-box {
+    height: 75px;
+    transition: height 1s;
+}
+
 #hotel-search-button {
     height: 55px;
+    width: 55px;
     border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.8);
     margin-right: 10px;
@@ -243,14 +255,7 @@ h5 {
 
 /* Loading spinner */
 #hotel-search-loading-spinner-container {
-    margin-bottom: 20px;
-}
-
-
-@media screen and (min-width: 768px) {
-    #hotel-search-loading-spinner-container {
-        margin-bottom: 50px;
-    }
+    margin-right: 22px;
 }
 
 /* Map start */

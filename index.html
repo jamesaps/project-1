@@ -66,7 +66,6 @@
   </nav>
   <!-- End navigation bar -->
 
-
   <!-- // jumbotron and search -->
   <div id="jumbotron-container" class="jumbotron-container">
     <div id="jumbotron" class="jumbotron container-fluid d-flex justify-content-center align-items-center">
@@ -76,8 +75,17 @@
           <input type="text" id="hotel-search-box" class="form-control position-relative fs-4 ps-3 ps-md-5 z-1"
             placeholder="Where would you like to go?">
           <button type="submit" id="hotel-search-button"
-            class="btn btn-lg position-absolute top-50 end-0 translate-middle-y z-2" role="button"><i id="search-icon"
-              class="fa-solid fa-magnifying-glass"></i></button>
+            class="btn btn-lg position-absolute top-50 end-0 translate-middle-y z-2 position-relative" role="button">
+            <i id="hotel-search-icon" class="fa-solid fa-magnifying-glass"></i>
+          </button>
+          <div id="hotel-search-loading-spinner-container"
+            class="d-none position-absolute top-50 end-0 translate-middle-y z-2 position-relative">
+            <div id="hotel-search-loading-spinner" class="d-flex justify-content-center">
+              <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
         </div>
       </form>
     </div>
@@ -85,7 +93,6 @@
   <!-- // jumbotron and search -->
 
   <!-- Loading spinner -->
-
   <div id="hotel-search-loading-spinner-container" class="container-fluid d-none">
     <div id="hotel-search-loading-spinner" class="d-flex justify-content-center">
       <div class="spinner-border text-secondary" role="status">
@@ -93,6 +100,7 @@
       </div>
     </div>
   </div>
+  <!-- // Loading spinner -->
 
   <!-- Hotels cards  -->
   <div id="hotels-container" class="container-fluid d-none">
