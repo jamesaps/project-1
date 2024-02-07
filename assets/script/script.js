@@ -134,6 +134,8 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
     ]
   );
 
+  console.log(regionImage)
+
   colorWeatherWidgetsByBackgroundColor(weatherWidgets, regionImage.avgColor);
 
   renderHotels(regionDetails.name, weatherWidgets, regionImage.src, hotels, numberOfHotelsToDisplayPerPage);
@@ -291,6 +293,7 @@ function addHotelsToLocalStorage(regionId, hotels, options) {
 function renderHotels(regionName, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplayPerPage) {
   emptyHotelContainers();
 
+  console.log(regionImage)
   createHotelContainerHeader(regionName, weatherWidgets, regionImage);
 
   createHotelGrid(hotels.slice(0, numberOfHotelsToDisplay));
@@ -612,7 +615,6 @@ function showHotelModal(hotel) {
   modal.addEventListener('shown.bs.modal', event => {
     modalMap.invalidateSize();
   })
-
 }
 
 function createCarouselItem(src, appendTo, active = false, captionHead = '', captionBody = '', alt = '') {
@@ -653,7 +655,7 @@ function unhighlightHotelCard(hotelId) {
   hotelCard.classList.remove('highlighted-hotel-card');
 }
 
-function createHotelContainerHeader(regionName, weatherWidgets, regionimage) {
+function createHotelContainerHeader(regionName, weatherWidgets, regionImage) {
   var hotelHeader = document.createElement('h3');
   hotelHeader.classList.add('m-0');
   hotelHeader.textContent = "Hotels in " + regionName;
@@ -664,9 +666,11 @@ function createHotelContainerHeader(regionName, weatherWidgets, regionimage) {
     hotelsWidgetsContainer.appendChild(widget);
   }
 
-  if (regionimage !== undefined) {
-    hotelsHeaderImage.style.backgroundImage = `url(${regionimage})`;
-    hotelsHeaderWrapper.style.backgroundImage = `url(${regionimage})`;
+  console.log(regionImage)
+
+  if (regionImage !== undefined) {
+    hotelsHeaderImage.style.backgroundImage = `url(${regionImage})`;
+    hotelsHeaderWrapper.style.backgroundImage = `url(${regionImage})`;
   }
 }
 
@@ -1052,14 +1056,20 @@ async function getImagesBasedOnString(string) {
     return imageFromLocalStorage;
   }
 
-  var images
+  var images;
+  var triedUnsplash = false;
 
   if (!choosePexels.has(string)) {
     images = await getImageBasedOnStringUnsplash(string);
+    triedUnsplash = true;
   }
 
   if (images === undefined) {
     images = await getImagesBasedOnStringPexels(string);
+  }
+
+  if (!triedUnsplash) {
+    images = await getImageBasedOnStringUnsplash(string);
   }
 
   if (images === undefined) {
@@ -1068,7 +1078,7 @@ async function getImagesBasedOnString(string) {
 
   addImageSearchToLocalStorage(string, images);
 
-  return images;
+  return getRandomElementFromArray(images);
 }
 
 var pexelsApiKey = 'dtrWFUVjWibbygEarHZzUstSDs1kDpr5NdXVVFP1aXcXT0Vu1u5vF7es';
@@ -1108,9 +1118,9 @@ function getImagesBasedOnStringFromLocalStorage(string) {
 
   console.log(`Image for search string: "${string}" retrieved from local storage.`)
 
-  var image = getRandomElementFromArray(images);
+  // var image = getRandomElementFromArray(images);
 
-  return image;
+  return images;
 }
 
 function addImageSearchToLocalStorage(string, images) {
@@ -1143,28 +1153,37 @@ async function getImageBasedOnStringUnsplash(string) {
   var url = `${unsplashApiBaseURL}/search/photos?query=${string}`;
   var corsUrl = `${corsProxyURLPrefix}${encodeURIComponent(url)}`;
 
-  var response = await fetch(corsUrl, unsplashApiOptions);
-  var data = await response.json();
+  try {
+    var response = await fetch(corsUrl, unsplashApiOptions);
+    var data = await response.json();
 
-  console.log(data);
+    console.log(data);
 
-  if (data.results.length === 0) {
+    if (data.results.length === 0) {
+      return undefined;
+    }
+
+    var imageId = data.results[0].id;
+
+    url = `${unsplashApiBaseURL}/photos/${imageId}`;
+    corsUrl = `${corsProxyURLPrefix}${encodeURIComponent(url)}`;
+
+    var response2 = await fetch(corsUrl, unsplashApiOptions);
+    var data2 = await response2.json();
+
+    console.log(data2);
+
+    if (!data2.id) {
+      return undefined;
+    }
+
+    return [{ src: data2.urls.raw, avgColor: data2.color }];
+  } catch (error) {
+    console.log(error);
     return undefined;
   }
 
-  var imageId = data.results[0].id;
 
-  url = `${unsplashApiBaseURL}/photos/${imageId}`;
-  corsUrl = `${corsProxyURLPrefix}${encodeURIComponent(url)}`;
-
-  var response2 = await fetch(corsUrl, unsplashApiOptions);
-  var data2 = await response2.json();
-
-  if (!data2.id) {
-    return undefined;
-  }
-
-  return [{ src: data2.urls.raw, avgColor: data2.color }];
 }
 
 /* Images API End */
