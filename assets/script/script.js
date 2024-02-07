@@ -46,12 +46,14 @@ var saveOptions = {
   regions: 1,
   hotels: 2,
   images: 3,
+  recommendations: 4,
 }
 
 var searchTermsData = {}; // { searchTerm: regionId }
 var regionsData = {}; // { regionId: [{id, name}]}
 var hotelsData = {}; // { regionId: [hotel+options] }
 var imagesSearchData = {}; // { keyword: [{src, avgColor}] }
+var recommendationsData = {}; // { "lat,lon": [{category: placeToGo}] }
 
 loadDataFromLocalStorage();
 
@@ -60,6 +62,7 @@ function loadDataFromLocalStorage() {
   var localStorageRegions = localStorage.getItem('regions');
   var localStorageHotels = localStorage.getItem('hotels');
   var localStorageImages = localStorage.getItem('images');
+  var localStorageRecommendations = localStorage.getItem('recommendations');
 
   if (localStorageSearchTerms !== null) {
     searchTermsData = JSON.parse(localStorageSearchTerms);
@@ -75,6 +78,10 @@ function loadDataFromLocalStorage() {
 
   if (localStorageImages !== null) {
     imagesSearchData = JSON.parse(localStorageImages);
+  }
+
+  if (localStorageRecommendations !== null) {
+    recommendationsData = JSON.parse(localStorageRecommendations);
   }
 }
 
@@ -93,6 +100,10 @@ function saveDataToLocalStorage(saveOption) {
 
   if (saveOption === undefined || saveOption === saveOptions.images) {
     saveObjectToLocalStorage('images', imagesSearchData);
+  }
+
+  if (saveOption === undefined || saveOption === saveOptions.recommendations) {
+    saveObjectToLocalStorage('recommendations', recommendationsData);
   }
 }
 
@@ -572,7 +583,15 @@ function createHotelCard(hotel, index) {
   return hotelCard;
 }
 
-function showHotelModal(hotel) {
+async function showHotelModal(hotel) {
+  var modalMapContainer = document.getElementById('modal-map-container');
+  var recommendationsContainer = document.getElementById('modal-recommendations');
+  emptyElement(modalMapContainer);
+  emptyElement(recommendationsContainer);
+
+  var { latitude, longitude } = hotel.mapMarker.latLong;
+  var hotelCoordinates = { latitude, longitude };
+
   var modal = document.getElementById('modal');
   var bsModal = new bootstrap.Modal(document.getElementById('modal'));
 
@@ -593,18 +612,10 @@ function showHotelModal(hotel) {
 
   bsModal.show();
 
-  var modalMapContainer = document.getElementById('modal-map-container');
-  emptyElement(modalMapContainer);
-
   var modalMapElement = document.createElement('div');
   modalMapElement.classList.add('prominent-section');
   modalMapElement.id = 'modal-map';
   modalMapContainer.appendChild(modalMapElement);
-
-  // if (modalMap !== undefined) {
-  //   modalMap.off();
-  //   modalMap.remove();
-  // }
 
   modalMap = L.map('modal-map').setView([51.05, -0.09], 13);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -612,9 +623,20 @@ function showHotelModal(hotel) {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(modalMap);
 
-  modal.addEventListener('shown.bs.modal', event => {
+  modal.addEventListener('shown.bs.modal', () => {
     modalMap.invalidateSize();
-  })
+  });
+
+  var recommendations = await getRecommendationsNearLocation(hotelCoordinates);
+
+  renderRecommendationsToModal(recommendations, recommendationsContainer);
+}
+
+function renderRecommendationsToModal(recommendations, appendTo) {
+  var titleContainer = document.createElement('div');
+  titleContainer.classList.add('col-12');
+
+  titleContainer.innerHTML = '<h2>Here are some points of interest near the hotel</h2>';
 }
 
 function createCarouselItem(src, appendTo, active = false, captionHead = '', captionBody = '', alt = '') {
@@ -626,7 +648,7 @@ function createCarouselItem(src, appendTo, active = false, captionHead = '', cap
     carouselItem.classList.add('active');
   }
 
-  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 object-fit-contain prominent-section" alt="${alt}">
+  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 object-fit-cover prominent-section" alt="${alt}">
   <div class="carousel-caption d-none d-md-block">
     <h5>${captionHead}</h5>
     <p>${captionBody}</p>
@@ -731,7 +753,7 @@ function showElement(element) {
 }
 
 function emptyElement(element) {
-  if (element === undefined) {
+  if (element === undefined || element === null) {
     return;
   }
 
@@ -1247,3 +1269,88 @@ function getTextColor(bgColor) {
 }
 
 /** END: https://wunnle.com/dynamic-text-color-based-on-background  **/
+
+/** Local suggestions API Start */
+
+//--> static inputs for /{lang}/places/radius endpoint 
+const suggestionsRadius = "10000";
+const suggestionsListLimit = "2";
+const suggestionsMinPopularity = "1";
+const suggestionsOpenTripApiKey = "5ae2e3f221c38a28845f05b600eb874f334b70babd7547a89821c944";
+
+//--> Function to call API for a given category
+
+function getRecommendationsNearLocationFromLocalStorage(coordinates) {
+  var coordinatesAsString = convertCoordinatesToLatLonString(coordinates);
+  var recommendations = recommendationsData[coordinatesAsString];
+
+  return recommendations;
+}
+
+function addRecommendationsToLocalStorage(coordinates, recommendations) {
+  var coordinatesAsString = convertCoordinatesToLatLonString(coordinates);
+
+  recommendationsData[coordinatesAsString] = recommendations;
+  saveDataToLocalStorage(saveOptions.recommendations);
+}
+
+function convertCoordinatesToLatLonString(coordinates) {
+  return `${coordinates.latitude},${coordinates.longitude}`;
+}
+
+async function getRecommendationsNearLocation(coordinates) {
+  var localStorageRecommendations = getRecommendationsNearLocationFromLocalStorage(coordinates);
+
+  if (localStorageRecommendations !== undefined) {
+    console.log(`Retrieved recommendations near coordinates (lat: ${coordinates.latitude}, lon: ${coordinates.longitude}) from local storage.`);
+    return localStorageRecommendations;
+  }
+
+  const cafeRest = "cafes,restaurants";
+  const barPub = "bars,pubs";
+  const entertainment = "amusements,sport,casino,theatres_and_entertainments";
+  const culture = "museums,historic_architecture,towers,historical_places,monuments_and_memorials";
+
+  var categories = { cafeRest, barPub, entertainment, culture };
+  var recommendations = await getRecommendationsForCategories(categories, coordinates);
+
+  addRecommendationsToLocalStorage(coordinates, recommendations);
+
+  return recommendations;
+}
+
+async function getRecommendationsForCategories(categories, coordinates) {
+  var recommendationsAsArray = await Promise.all(Object.entries(categories).map(async ([category, activities]) => {
+    return {
+      category,
+      placesToGo: await getRecommendationsForActivitiesByLocation(activities, coordinates),
+    }
+  }));
+
+  console.log(recommendationsAsArray)
+
+  var recommendations = {};
+
+  for (recommendation of recommendationsAsArray) {
+    var category = recommendation.category;
+    var placesToGo = recommendation.placesToGo;
+
+    recommendations[category] = placesToGo;
+  }
+
+  return recommendations;
+}
+
+async function getRecommendationsForActivitiesByLocation(activities, coordinates) {
+  // activities is a comma separated string
+
+  var queryURL = `https://api.opentripmap.com/0.1/en/places/radius?radius=${suggestionsRadius}&lon=${coordinates.longitude}&lat=${coordinates.latitude}&kinds=${activities}&rate=${suggestionsMinPopularity}&format=json&limit=${suggestionsListLimit}&apikey=${suggestionsOpenTripApiKey}`;
+
+  var response = await fetch(queryURL);
+  var data = await response.json();
+
+  return data;
+}
+
+/** Local suggestions API End */
+
