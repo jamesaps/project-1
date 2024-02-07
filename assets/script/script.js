@@ -452,7 +452,7 @@ function createHotelCard(hotel, index) {
   }
 
   var hotelCardBody = document.createElement('div');
-  hotelCardBody.classList.add('hotel-card-body');
+  hotelCardBody.classList.add('hotel-card-body', 'text-truncate');
 
   var hotelCardTop = document.createElement('div');
   hotelCardTop.classList.add('hotel-card-top');
@@ -470,7 +470,7 @@ function createHotelCard(hotel, index) {
   hotelCardBottomRight.classList.add('hotel-card-bottom-right');
 
   var hotelCardlName = document.createElement('div');
-  hotelCardlName.classList.add('hotel-card-name');
+  hotelCardlName.classList.add('hotel-card-name', 'text-truncate');
   hotelCardlName.textContent = hotel.name;
 
   var hotelCardLocation = document.createElement('div');
