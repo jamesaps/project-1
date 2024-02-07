@@ -18,6 +18,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/modal.css">
 
   <title>Travel App</title>
 </head>
@@ -66,7 +67,6 @@
         </ul>
       </div>
     </div>
-    </div>
   </nav>
   <!-- End navigation bar -->
 
@@ -79,7 +79,7 @@
           <input type="text" id="hotel-search-box" class="form-control position-relative fs-4 ps-3 ps-md-5 z-1"
             placeholder="Where would you like to go?">
           <button type="submit" id="hotel-search-button"
-            class="btn btn-lg position-absolute top-50 end-0 translate-middle-y z-2 position-relative" role="button">
+            class="btn btn-lg position-absolute top-50 end-0 translate-middle-y z-2 position-relative">
             <i id="hotel-search-icon" class="fa-solid fa-magnifying-glass"></i>
           </button>
           <div id="hotel-search-loading-spinner-container"
@@ -107,8 +107,6 @@
       </div>
     </div>
   </div>
-
-
 
   <div id="hotels-container" class="container-fluid d-none"></div>
 
@@ -149,7 +147,7 @@
           </div>
 
           <div class="footer-section">
-            <p class="copyright-notice">© 2024 Company. | All rights reserved</p>
+            <p class="copyright-notice">&copy; 2024 Company. | All rights reserved</p>
           </div>
         </div>
       </div>
@@ -185,6 +183,64 @@
   </footer>
   <!-- Footer End -->
 
+  <!-- Modal Start -->
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-lg-down">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <div class="container-fluid">
+            <h1 id="modal-title" class="modal-title">Modal
+              title
+            </h1>
+          </div>
+          <button type="button" class="btn-close align-self-start" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6">
+                <div id="carousel" class="carousel carousel-dark slide prominent-section" data-bs-ride="carousel">
+                  <div id="carousel-inner" class="carousel-inner"></div>
+                </div>
+              </div>
+              <div id="modal-map-container" class="col-md-6">Map</div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-12">
+                <ul class="list-group list-group-horizontal ">
+                  <li class="list-group-item flex-fill">An item</li>
+                  <li class="list-group-item flex-fill">A second item</li>
+                  <li class="list-group-item flex-fill">A third item</li>
+                  <li class="list-group-item flex-fill">A fourth item</li>
+                </ul>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">Things to do</div>
+              <div class="col-4">Entertainment</div>
+              <div class="col-4">Restaurants</div>
+              <div class="col-4">Culture</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal End-->
+
+
+
+
+
+
+
+
+
 
   <!-- Popper.js, Bootstrap JS, Font Awesome, Leaflet JS, Day JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -195,9 +251,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
     integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
     crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
-    integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-extra-markers/1.2.2/js/leaflet.extra-markers.js"
     integrity="sha512-DETKQz6E4+71mS8bSCEcwyEI8Ogd5/I6FcsgUkGZT6YfW43qOwjwJ8uXP70ox2Q+w2UKlbS5yNko1YkcS4TPqQ=="

@@ -30,6 +30,7 @@ var hotelMapMarkers = {};
 var numberOfHotelsToDisplayPerPage = 7;
 
 var map;
+var modalMap;
 var mapContainer;
 
 var apiOptions = {
@@ -453,8 +454,7 @@ function createHotelCard(hotel, index) {
   });
 
   hotelCard.addEventListener('click', function (event) {
-    // highlightMapMarker();
-    // showHotelModal(hotel);
+    showHotelModal(hotel, index);
   });
 
   hotelCard.id = `hotel-${index}`;
@@ -569,6 +569,70 @@ function createHotelCard(hotel, index) {
   return hotelCard;
 }
 
+function showHotelModal(hotel) {
+  var modal = document.getElementById('modal');
+  var bsModal = new bootstrap.Modal(document.getElementById('modal'));
+
+  var modalTitle = document.getElementById('modal-title');
+  modalTitle.textContent = hotel.name;
+
+  var carouselInner = document.getElementById('carousel-inner');
+  emptyElement(carouselInner);
+
+  var mainImageValid = false;
+  if (hotel.propertyImage && hotel.propertyImage.image && hotel.propertyImage.image.url) {
+    createCarouselItem(hotel.propertyImage.image.url, carouselInner, true);
+  }
+
+  if (hotel.propertyImage && hotel.propertyImage.fallbackImage && hotel.propertyImage.fallbackImage.url) {
+    createCarouselItem(hotel.propertyImage.fallbackImage.url, carouselInner, !mainImageValid);
+  }
+
+  bsModal.show();
+
+  var modalMapContainer = document.getElementById('modal-map-container');
+  emptyElement(modalMapContainer);
+
+  var modalMapElement = document.createElement('div');
+  modalMapElement.classList.add('prominent-section');
+  modalMapElement.id = 'modal-map';
+  modalMapContainer.appendChild(modalMapElement);
+
+  // if (modalMap !== undefined) {
+  //   modalMap.off();
+  //   modalMap.remove();
+  // }
+
+  modalMap = L.map('modal-map').setView([51.05, -0.09], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(modalMap);
+
+  modal.addEventListener('shown.bs.modal', event => {
+    modalMap.invalidateSize();
+  })
+
+}
+
+function createCarouselItem(src, appendTo, active = false, captionHead = '', captionBody = '', alt = '') {
+  var carouselItem = document.createElement('div');
+  carouselItem.classList.add('carousel-item');
+  carouselItem.setAttribute('data-bs-interval', 3000);
+
+  if (active) {
+    carouselItem.classList.add('active');
+  }
+
+  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 object-fit-fill prominent-section" alt="${alt}">
+  <div class="carousel-caption d-none d-md-block">
+    <h5>${captionHead}</h5>
+    <p>${captionBody}</p>
+  </div>`;
+
+  appendTo.appendChild(carouselItem);
+}
+
 function highlightHotelCard(hotelId) {
   var hotelCard = document.getElementById(hotelId);
 
@@ -615,6 +679,8 @@ function createMapContainer() {
   var mapElement = document.createElement('div');
   mapElement.setAttribute('id', 'map');
   mapContainer.appendChild(mapElement);
+
+  mapElement.classList.add('map');
 
   return mapContainer;
 }
@@ -750,7 +816,7 @@ $(".dropdown-item").on("click", function (event) {
 
 window.addEventListener('load', function () {
   hotelSearchBox.focus();
-  searchLocationForHotels({}, 'London');
+  // searchLocationForHotels({}, 'London');
 });
 
 /* Maps functionality Start */
@@ -784,7 +850,7 @@ var highlightedMapMarker = L.ExtraMarkers.icon({
 function updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplay) {
   var slicedHotels = hotels.slice(0, numberOfHotelsToDisplay);
 
-  resetMap();
+  resetMap(map);
   createMapMarkersForHotels(slicedHotels);
   addMarkersToMap();
   fitMapToMarkers();
