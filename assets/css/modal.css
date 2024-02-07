@@ -14,4 +14,18 @@
         margin-top: 10px;
     }
 
+    #carousel-list {
+        .list-group-item {
+            border-radius: 0px;
+        }
+
+        .list-group-item:first-child {
+            border-bottom-left-radius: 5px !important;
+        }
+
+        .list-group-item:last-child {
+            border-bottom-right-radius: 5px !important;
+        }
+    }
+
 }

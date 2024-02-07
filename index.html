@@ -33,14 +33,14 @@
         <p class="navbar-toggler-icon"></p>
       </button>
       <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ml-auto">
+        <ul id="primary-nav" class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="#">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#searchBox">Search Destination</a>
+            <a class="nav-link" href="#jumbotron-container">Search Destination</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item d-none">
             <a class="nav-link" href="#Itinerary Planner">Itinerary Planner</a>
           </li>
           <li class="nav-item d-lg-none">
@@ -102,8 +102,24 @@
       <div id="hotels-header-image" class="d-none"></div>
       <div id="hotels-header-details" class="">
         <div id="hotels-widgets-container" class="">1</div>
-        <div id="hotels-location" class="start-50 translate-middle-x subtle-shadow"></div>
+        <div id="hotels-location" class="position-absolute start-50 translate-middle-x subtle-shadow"></div>
         <div id="right-hotel-header-container" class=""></div>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-12">
+        <div class="dropdown" id="dropDown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            FILTER
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" style="">
+            <li><a class="dropdown-item" id="item1" data-index="REVIEW">REVIEW</a></li>
+            <li><a class="dropdown-item" id="item2" data-index="RECOMMENDED">RECOMMENDED</a></li>
+            <li><a class="dropdown-item" id="item3" data-index="DISTANCE">DISTANCE</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -199,24 +215,25 @@
           <div class="container-fluid">
             <div class="row">
               <div class="col-md-6">
-                <div id="carousel" class="carousel carousel-dark slide prominent-section" data-bs-ride="carousel">
+                <div id="carousel"
+                  class="carousel carousel-dark slide position-relative prominent-section overflow-hidden"
+                  data-bs-ride="carousel">
                   <div id="carousel-inner" class="carousel-inner"></div>
+
+                  <div class="col-12 mt-4 position-absolute bottom-0 ">
+                    <ul id="carousel-list" class="list-group list-group-horizontal">
+                      <li class="list-group-item flex-fill modal-price"></li>
+                      <li class="list-group-item flex-fill modal-rating"></li>
+                      <li class="list-group-item flex-fill modal-reviews"></li>
+                    </ul>
+                  </div>
                 </div>
               </div>
               <div id="modal-map-container" class="col-md-6">Map</div>
             </div>
-            <div class="row mt-4">
+            <div id="modal-recommendations" class="row mt-4">
               <div class="col-12">
-                <ul class="list-group list-group-horizontal ">
-                  <li class="list-group-item flex-fill modal-price"></li>
-                  <li class="list-group-item flex-fill modal-rating"></li>
-                  <li class="list-group-item flex-fill modal-reviews"></li>
-                </ul>
-              </div>
-            </div>
-            <div id="recommendations" class="row mt-4">
-              <div class="col-12">
-                <h2></h2>
+                <h2 class="text-center">Things to do...</h2>
               </div>
               <div class="col-3">
                 <h3></h3>

@@ -633,10 +633,36 @@ async function showHotelModal(hotel) {
 }
 
 function renderRecommendationsToModal(recommendations, appendTo) {
-  var titleContainer = document.createElement('div');
-  titleContainer.classList.add('col-12');
+  emptyElement(appendTo);
 
+  var titleContainer = document.createElement('div');
+  titleContainer.classList.add('col-12', 'mb-4');
   titleContainer.innerHTML = '<h2>Here are some points of interest near the hotel</h2>';
+  appendTo.appendChild(titleContainer);
+
+  for ([category, locations] of Object.entries(recommendations)) {
+    var categoryContainer = document.createElement('div');
+    categoryContainer.classList.add('col-6', 'col-lg-3', 'mb-4');
+    appendTo.appendChild(categoryContainer);
+
+    var categoryHeading = document.createElement('h3');
+    categoryHeading.classList.add('fs-4', 'text-center');
+    categoryHeading.textContent = category;
+    categoryContainer.appendChild(categoryHeading);
+
+    var categoryListGroup = document.createElement('ul');
+    categoryListGroup.classList.add('list-group', 'h-100');
+    categoryContainer.appendChild(categoryListGroup);
+
+    for (loc of locations) {
+      console.log(loc)
+      var categoryLocationListItem = document.createElement('div');
+      categoryLocationListItem.classList.add('list-group-item', 'flex-fill');
+      categoryLocationListItem.innerHTML = `${loc.name} <span class="modal-location-distance">${loc.dist.toFixed(0)}m</span>`;
+
+      categoryListGroup.appendChild(categoryLocationListItem);
+    }
+  }
 }
 
 function createCarouselItem(src, appendTo, active = false, captionHead = '', captionBody = '', alt = '') {
@@ -842,7 +868,7 @@ $(".dropdown-item").on("click", function (event) {
 
 window.addEventListener('load', function () {
   hotelSearchBox.focus();
-  // searchLocationForHotels({}, 'London');
+  searchLocationForHotels({}, 'London');
 });
 
 /* Maps functionality Start */
@@ -1206,8 +1232,6 @@ async function getImageBasedOnStringUnsplash(string) {
     console.log(error);
     return undefined;
   }
-
-
 }
 
 /* Images API End */

@@ -164,16 +164,18 @@
  }
 
  .nav-link {
-     border-radius: 5px;
-     padding: 10px;
+     /* border-radius: 5px;
+     padding: 10px;*/
      transition: color 1s, background-color 1s;
+     /*background-color: var(--color-3);
+     color: white; */
+     color: var(--color-4);
  }
 
  /* Hover & Transition */
  .nav-link:hover {
-     background-color: var(--color-3);
-     color: white;
-
+     /* background-color: var(--color-5); */
+     color: var(--color-5);
  }
 
  /* Footer Start */
@@ -570,6 +572,7 @@
      padding: 0 30px;
      border-radius: 5px;
      height: 75px;
+     left: max(calc(75px + 75px + 30px), 50%) !important;
  }
 
  .hotel-widget {
