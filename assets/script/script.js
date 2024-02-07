@@ -127,7 +127,7 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
     [
       getHotelsByRegionId(regionDetails.id, options),
       createWeatherWidgets(regionDetails.coordinates),
-      getImageBasedOnString(regionImageSearchString),
+      getImagesBasedOnString(regionImageSearchString),
     ]
   );
 
@@ -883,16 +883,41 @@ async function createWeatherWidgets(coordinates) {
 /* Weather functionality End */
 
 /* Images API */
-var pexelsApiKey = 'dtrWFUVjWibbygEarHZzUstSDs1kDpr5NdXVVFP1aXcXT0Vu1u5vF7es';
-var pexelsApiBaseURL = 'https://api.pexels.com/v1';
 
-async function getImageBasedOnString(string) {
-  var imageFromLocalStorage = getImageBasedOnStringFromLocalStorage(string);
+async function getImagesBasedOnString(string) {
+  string = string.trim().toLowerCase();
+
+  var imageFromLocalStorage = getImagesBasedOnStringFromLocalStorage(string);
+
+  var choosePexels = new Set(['london'])
 
   if (imageFromLocalStorage !== undefined) {
     return imageFromLocalStorage;
   }
 
+  var images
+
+  if (!choosePexels.has(string)) {
+    images = await getImageBasedOnStringUnsplash(string);
+  }
+
+  if (images === undefined) {
+    images = await getImagesBasedOnStringPexels(string);
+  }
+
+  if (images === undefined) {
+    return undefined;
+  }
+
+  addImageSearchToLocalStorage(string, images);
+
+  return images;
+}
+
+var pexelsApiKey = 'dtrWFUVjWibbygEarHZzUstSDs1kDpr5NdXVVFP1aXcXT0Vu1u5vF7es';
+var pexelsApiBaseURL = 'https://api.pexels.com/v1';
+
+async function getImagesBasedOnStringPexels(string) {
   console.log(`Searching API for images matching: "${string}"`);
 
   var url = `${pexelsApiBaseURL}/search?query=${string}&orientation=square`;
@@ -913,15 +938,14 @@ async function getImageBasedOnString(string) {
   }
 
   var images = decodedResponse.photos.map(photo => photo.src.large2x);
-  addImageSearchToLocalStorage(string, images);
 
-  return getRandomElementFromArray(images);
+  return images;
 }
 
-function getImageBasedOnStringFromLocalStorage(string) {
+function getImagesBasedOnStringFromLocalStorage(string) {
   var images = imagesSearchData[string];
 
-  if (images === undefined) {
+  if (!images || images.length === 0) {
     return undefined;
   }
 
@@ -944,6 +968,46 @@ function addImageSearchToLocalStorage(string, images) {
   saveDataToLocalStorage(saveOptions.images);
 
   console.log(`Saved images for string: "${string}" to local storage.`)
+}
+
+var unsplashApiKey = 'aZ2nCNIqgQZVKUSEASmMdkmy4FZ8xm05LvD9Qi5x8KY';
+var unsplashApiBaseURL = 'https://api.unsplash.com';
+var unsplashApiVersion = 'v1';
+
+var unsplashApiOptions = {
+  method: 'GET',
+  headers: {
+    'Authorization': `Client-ID ${unsplashApiKey}`,
+    'Accept-Version': unsplashApiVersion,
+  }
+}
+
+async function getImageBasedOnStringUnsplash(string) {
+  var url = `${unsplashApiBaseURL}/search/photos?query=${string}&orientation=squarish`;
+  var corsUrl = `${corsProxyURLPrefix}${encodeURIComponent(url)}`;
+
+  var response = await fetch(corsUrl, unsplashApiOptions);
+  var data = await response.json();
+
+  console.log(data);
+
+  if (data.results.length === 0) {
+    return undefined;
+  }
+
+  var imageId = data.results[0].id;
+
+  url = `${unsplashApiBaseURL}/photos/${imageId}`;
+  corsUrl = `${corsProxyURLPrefix}${encodeURIComponent(url)}`;
+
+  var response2 = await fetch(corsUrl, unsplashApiOptions);
+  var data2 = await response2.json();
+
+  if (!data2.id) {
+    return undefined;
+  }
+
+  return [data2.urls.raw];
 }
 
 /* Images API End */
