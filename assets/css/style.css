@@ -362,6 +362,11 @@
      cursor: pointer;
  }
 
+ .highlighted-hotel-card,
+ .hotel-card:hover {
+     background-color: var(--color-4);
+ }
+
  .hotel-card:hover {
      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
  }
@@ -380,6 +385,11 @@
      border-bottom: 1px solid var(--color-3-faint);
      display: flex;
      flex-direction: column;
+ }
+
+ .highlighted-hotel-card .hotel-card-top,
+ .hotel-card:hover .hotel-card-top {
+     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
  }
 
  .hotel-card-bottom {
@@ -413,8 +423,18 @@
      color: var(--color-2);
  }
 
+ .highlighted-hotel-card .hotel-card-name,
+ .hotel-card:hover .hotel-card-name {
+     color: white;
+ }
+
  .hotel-card-location {
      color: var(--color-3);
+ }
+
+ .highlighted-hotel-card .hotel-card-location,
+ .hotel-card:hover .hotel-card-location {
+     color: var(--color-5);
  }
 
  .hotel-card-rating {
@@ -430,11 +450,21 @@
      color: var(--color-1);
  }
 
+ .highlighted-hotel-card .hotel-card-rating-number,
+ .hotel-card:hover .hotel-card-rating-number {
+     color: white;
+ }
+
  .hotel-card-rating-out-of-text {
      font-size: xx-small;
      position: relative;
      bottom: -3px;
      color: var(--color-4);
+ }
+
+ .highlighted-hotel-card .hotel-card-rating-out-of-text,
+ .hotel-card:hover .hotel-card-rating-out-of-text {
+     /* keep the same */
  }
 
  .hotel-card-rating-out-of-number {
@@ -444,14 +474,29 @@
      color: var(--color-5);
  }
 
+ .highlighted-hotel-card .hotel-card-rating-out-of-number,
+ .hotel-card:hover .hotel-card-rating-out-of-number {
+     /* keep the same */
+ }
+
  .hotel-card-reviews-number {
      font-size: small;
      color: var(--color-5);
  }
 
+ .highlighted-hotel-card .hotel-card-reviews-number,
+ .hotel-card:hover .hotel-card-reviews-number {
+     /* keep the same */
+ }
+
  .hotel-card-price {
      display: flex;
      align-items: center;
+ }
+
+ .highlighted-hotel-card .hotel-card-price,
+ .hotel-card:hover .hotel-card-price {
+     color: white;
  }
 
  .hotel-card-price-amount {
@@ -466,6 +511,11 @@
      font-size: small;
      text-align: right;
      color: var(--color-5);
+ }
+
+ .highlighted-hotel-card .hotel-card-price-unit,
+ .hotel-card:hover .hotel-card-price-unit {
+     color: white;
  }
 
  .hotel-card-image-holder {

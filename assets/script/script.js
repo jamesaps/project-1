@@ -25,6 +25,8 @@ var apiHost = 'hotels-com-provider.p.rapidapi.com';
 
 var corsProxyURLPrefix = 'https://corsproxy.io/?';
 
+var hotelMapMarkers = {};
+
 var numberOfHotelsToDisplay = 8;
 
 var map;
@@ -442,6 +444,23 @@ function createGridTemplateColumnsString(columns) {
 
 function createHotelCard(hotel, index) {
   var hotelCard = document.createElement('div');
+
+  hotelCard.addEventListener('mouseover', function (event) {
+    // highlight appropriate marker on map
+    hotelMapMarkers[`hotel-${index}`].setIcon(highlightedMapMarker);
+  });
+
+  hotelCard.addEventListener('mouseout', function (event) {
+    // remove highlight from appropriate marker on map
+    hotelMapMarkers[`hotel-${index}`].setIcon(defaultMapMarker);
+  });
+
+  hotelCard.addEventListener('click', function (event) {
+    // highlightMapMarker();
+    // showHotelModal(hotel);
+  });
+
+  hotelCard.id = `hotel-${index}`;
   hotelCard.classList.add('hotel-card');
   hotelCard.style.gridArea = `hotel-${index}`;
 
@@ -551,6 +570,26 @@ function createHotelCard(hotel, index) {
   hotelCardPrice.appendChild(hotelCardPriceAmount);
 
   return hotelCard;
+}
+
+function highlightHotelCard(hotelId) {
+  var hotelCard = document.getElementById(hotelId);
+
+  if (hotelCard === null) {
+    return;
+  }
+
+  hotelCard.classList.add('highlighted-hotel-card');
+}
+
+function unhighlightHotelCard(hotelId) {
+  var hotelCard = document.getElementById(hotelId);
+
+  if (hotelCard === null) {
+    return;
+  }
+
+  hotelCard.classList.remove('highlighted-hotel-card');
 }
 
 function createHotelContainerHeader(regionName, weatherWidgets, regionimage) {
@@ -721,6 +760,30 @@ window.addEventListener('load', function () {
 
 var mapMarkers = [];
 
+var defaultMapMarker = L.ExtraMarkers.icon({
+  shape: 'circle',
+  markerColor: 'blue',
+  prefix: 'fa',
+  icon: '',
+  iconColor: '#fff',
+  iconRotate: 0,
+  extraClasses: '',
+  number: '',
+  svg: false,
+});
+
+var highlightedMapMarker = L.ExtraMarkers.icon({
+  shape: 'star',
+  markerColor: 'yellow',
+  prefix: 'fa',
+  icon: '',
+  iconColor: '#fff',
+  iconRotate: 270,
+  extraClasses: '',
+  number: '',
+  svg: false,
+});
+
 function updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplay) {
   var slicedHotels = hotels.slice(0, numberOfHotelsToDisplay);
 
@@ -732,18 +795,46 @@ function updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplay) {
 
 function createMapMarkersForHotels(hotels) {
   mapMarkers = [];
+  hotelMapMarkers = {};
 
   for (var i = 0; i < hotels.length; ++i) {
-    createMapMarker(hotels[i]);
+    createMapMarker(hotels[i], i);
   }
 }
 
-function createMapMarker(hotel) {
+function unhighlightAll() {
+  mapMarkers.forEach(marker => marker.setIcon(defaultMapMarker));
+  document.querySelectorAll('.hotel-card').forEach(hotelCard => hotelCard.classList.remove('highlighted-hotel-card'));
+}
+
+function createMapMarker(hotel, i) {
   var { latitude, longitude } = hotel.mapMarker.latLong;
   var latLng = [latitude, longitude];
 
-  var marker = L.marker(latLng, { title: hotel.name });
+  var marker = L.marker(latLng, { title: hotel.name, icon: defaultMapMarker });
+
+  marker.once('mouseover', function (event) {
+    unhighlightAll()
+
+    this.setIcon(highlightedMapMarker);
+    highlightHotelCard(`hotel-${i}`);
+  });
+
+  marker.on('mouseout', function (event) {
+    this.setIcon(defaultMapMarker);
+    unhighlightHotelCard(`hotel-${i}`);
+    unhighlightAll();
+
+    this.once('mouseover', function (event) {
+      unhighlightAll();
+
+      this.setIcon(highlightedMapMarker);
+      highlightHotelCard(`hotel-${i}`);
+    })
+  });
+
   mapMarkers.push(marker);
+  hotelMapMarkers[`hotel-${i}`] = marker;
 
   var popupElement = document.createElement('div');
   popupElement.textContent = hotel.name;
