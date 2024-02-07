@@ -93,21 +93,38 @@
   <!-- // jumbotron and search -->
 
   <!-- Hotels cards  -->
-  <div id="hotels-header-container" class="d-none">
-    <div id="hotels-header" class="container-fluid ">
-      <div class="row h-100 align-items-center justify-content-between text-center">
-        <div class="col-12 col-md-4">1</div>
-        <div class="col-12 col-md-4" id="hotels-location"></div>
-        <div class="col-12 col-md-4">3</div>
+  <div id="hotels-header-container" class="d-none container-fluid">
+    <div id="hotels-header-wrapper" class="position-relative">
+      <div id="hotels-location" class="position-absolute start-50 translate-middle-x subtle-shadow"></div>
+      <div id="hotels-header-image" class="d-none"></div>
+      <div id="hotels-header-details" class="">
+        <div id="hotels-widgets-container" class="">1</div>
+        <div id="right-hotel-header-container" class=""></div>
       </div>
     </div>
   </div>
+  <!-- 
+  <div class="d-none">
+    <div id="hotels-header-container" class="d-none">
+      <div id="hotels-header" class="container-fluid ">
+        <div class="row h-100 align-items-center justify-content-between text-center">
+          <div class="col-3">
+            <div class="">hey</div>
+          </div>
+          <div class="col-9">
+            <div class="row">
+              <div id="hotels-widgets-container" class="col">1</div>
+              <div id="hotels-location" class="col"></div>
+              <div id="right-hotel-header-container" class="col">3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
   </div>
 
   <div id="hotels-container" class="container-fluid d-none"></div>
-  <!-- <div id="map-container" class="container-fluid map-container d-none">
-    <div id="map"></div>
-  </div> -->
 
   <!-- Footer Start -->
   <footer class="container-fluid footer">

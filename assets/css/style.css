@@ -14,15 +14,19 @@
      --color-3: #BDA69E;
      --color-3-faint: rgba(189, 166, 158, 0.3);
      --color-4: #455A81;
+     --color-4-deep: rgba(69, 90, 129, 0.8);
      --color-4-mid: rgba(69, 90, 129, 0.6);
      --color-4-faint: rgba(69, 90, 129, 0.3);
      --color-5: #788CB6;
-     --color-6: rgb(245, 246, 247)
+     --color-6: rgb(245, 246, 247);
+     --color-6-mid: rgb(245, 246, 247, 0.6);
+     --color-6-deep: rgb(245, 246, 247, 0.8);
  }
 
 
- .body {
+ body {
      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+     background-color: var(--color-6);
  }
 
  /* NavBar styling */
@@ -64,7 +68,7 @@
      background-image: url(../images/sean-oulashin-KMn4VEeEPR8-unsplash.jpg);
      background-size: cover;
      border-radius: 10px;
-     height: calc(100vh - 101px - 20px);
+     height: 95px;
      background-position: center;
      transition: justify-content 1s;
  }
@@ -476,14 +480,85 @@
  #hotels-header-container {
      padding: 10px;
      padding-top: 0;
-     background-color: var(--color-6);
+     /* background-color: var(--color-6); */
  }
 
- #hotels-header {
+ #hotels-header-wrapper {
      border-radius: 10px;
      padding: 10px;
-     height: 95px;
+     height: 250px;
      background-color: salmon;
+     background-size: cover;
+     background-position: center;
+ }
+
+ #hotels-header-image {
+     background-position: bottom;
+     background-size: cover;
+     width: 250px;
+     border-radius: 5px;
+ }
+
+ #hotels-header-details {
+     display: flex;
+     justify-content: space-between;
  }
 
  /* Hotel Cards */
+
+ /* Start Hotel Title Bar */
+ #hotels-widgets-container {
+     display: flex;
+     align-items: start;
+     gap: 10px
+ }
+
+ #hotels-location {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     background-color: rgba(255, 255, 255, 0.8);
+     padding: 0 30px;
+     border-radius: 5px;
+     height: 75px;
+ }
+
+ .hotel-widget {
+     min-width: 75px;
+     min-height: 75px;
+     max-width: 75px;
+     max-height: 75px;
+     border-radius: 5px;
+     background-color: var(--color-6-mid);
+     border: 1px solid var(--color-6-deep);
+     color: var(--color-4);
+ }
+
+ .hotel-widget-weather-icon {
+     background-size: cover;
+     background-position: center;
+ }
+
+ .hotel-widget-temperature {
+     position: relative;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+
+ .hotel-widget-temperature-degrees-c {
+     position: absolute;
+     top: 10px;
+     right: 5px;
+ }
+
+ .single-digit-temperature {
+     top: 10px;
+     right: 10px;
+ }
+
+ /* End Hotel Title Bar */
+
+ .subtle-shadow {
+     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+ }

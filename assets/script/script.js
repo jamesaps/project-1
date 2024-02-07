@@ -14,8 +14,16 @@ var hotelSearchIcon = document.getElementById('hotel-search-icon');
 var hotelsHeaderContainer = document.getElementById('hotels-header-container');
 var hotelsBodyContainer = document.getElementById('hotels-container');
 
+var hotelsHeaderWrapper = document.getElementById('hotels-header-wrapper');
+var hotelsHeaderImage = document.getElementById('hotels-header-image');
+var hotelsHeaderDetails = document.getElementById('hotels-header-details');
+
+var hotelsWidgetsContainer = document.getElementById('hotels-widgets-container');
+
 var apiKey = '37a742acecmshb1d0cea778ef597p1c03a8jsn8195f29d98b6';
 var apiHost = 'hotels-com-provider.p.rapidapi.com';
+
+var corsProxyURLPrefix = 'https://corsproxy.io/?';
 
 var numberOfHotelsToDisplay = 8;
 
@@ -34,11 +42,13 @@ var saveOptions = {
   searchTerms: 0,
   regions: 1,
   hotels: 2,
+  images: 3,
 }
 
 var searchTermsData = {}; // { searchTerm: regionId }
 var regionsData = {}; // { regionId: [{id, name}]}
 var hotelsData = {}; // { regionId: [hotel+options] }
+var imagesSearchData = {}; // { keyword: [url] }
 
 loadDataFromLocalStorage();
 
@@ -46,6 +56,7 @@ function loadDataFromLocalStorage() {
   var localStorageSearchTerms = localStorage.getItem('searchTerms');
   var localStorageRegions = localStorage.getItem('regions');
   var localStorageHotels = localStorage.getItem('hotels');
+  var localStorageImages = localStorage.getItem('images');
 
   if (localStorageSearchTerms !== null) {
     searchTermsData = JSON.parse(localStorageSearchTerms);
@@ -57,6 +68,10 @@ function loadDataFromLocalStorage() {
 
   if (localStorageHotels !== null) {
     hotelsData = JSON.parse(localStorageHotels);
+  }
+
+  if (localStorageImages !== null) {
+    imagesSearchData = JSON.parse(localStorageImages);
   }
 }
 
@@ -72,10 +87,18 @@ function saveDataToLocalStorage(saveOption) {
   if (saveOption === undefined || saveOption === saveOptions.hotels) {
     saveObjectToLocalStorage('hotels', hotelsData);
   }
+
+  if (saveOption === undefined || saveOption === saveOptions.images) {
+    saveObjectToLocalStorage('images', imagesSearchData);
+  }
 }
 
 function saveObjectToLocalStorage(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    localStorage.removeItem(key);
+  }
 }
 
 async function searchLocationForHotels(options = {}, overrideLocation) {
@@ -98,9 +121,17 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
   await simulateNetworkCall();
 
   var regionDetails = await getRegionDetailsByLocationName(locationName);
-  var hotels = await getHotelsByRegionId(regionDetails.id, options);
 
-  renderHotels(regionDetails.name, hotels, numberOfHotelsToDisplay);
+  var regionImageSearchString = `${regionDetails.name}`;
+  var [hotels, weatherWidgets, regionImage] = await Promise.all(
+    [
+      getHotelsByRegionId(regionDetails.id, options),
+      createWeatherWidgets(regionDetails.coordinates),
+      getImageBasedOnString(regionImageSearchString),
+    ]
+  );
+
+  renderHotels(regionDetails.name, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay);
 
   takePageOutOfLoadingState();
 
@@ -120,11 +151,18 @@ async function getRegionDetailsByLocationName(searchTerm) {
   var response = await fetch(url, apiOptions);
   var decodedResponse = await response.json();
 
+  console.log('********')
+  console.log(decodedResponse);
+
   console.log(`Made an API call to retrieve location details for search term: "${searchTerm}".`);
 
   var regionDetails = {
     name: decodedResponse.data[0].regionNames.primaryDisplayName,
     id: decodedResponse.data[0].gaiaId,
+    coordinates: {
+      lat: decodedResponse.data[0].coordinates.lat,
+      lon: decodedResponse.data[0].coordinates.long // api uses 'long' we use 'lon'
+    }
   };
 
   addSearchTermToLocalStorage(searchTerm, regionDetails.id);
@@ -248,11 +286,10 @@ function addHotelsToLocalStorage(regionId, hotels, options) {
   console.log(`Saved hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} to local storage.`)
 }
 
-function renderHotels(regionName, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplay) {
+function renderHotels(regionName, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplay) {
   emptyHotelContainers();
 
-  var hotelContainerHeader = createHotelContainerHeader(regionName);
-  $(hotelSearchLocationElement).append(hotelContainerHeader);
+  createHotelContainerHeader(regionName, weatherWidgets, regionImage);
 
   createHotelGrid(hotels);
 }
@@ -348,12 +385,10 @@ function createGridTemplateAreasString(hotels, columns) {
     }
   }
 
-  console.log(gridTemplateAreasSmallerScreens.slice(0, 5))
-
   var gridTemplateAreasString = createGridTemplateAreasStringFromGridTemplateAreas(gridTemplateAreas);
   var gridTemplateAreasSmallerScreensString = createGridTemplateAreasStringFromGridTemplateAreas(gridTemplateAreasSmallerScreens);
 
-  console.log(gridTemplateAreasString);
+  // console.log(gridTemplateAreasString);
 
   // Add the grid template areas styles to the document head because media queries cannot be applied inline
 
@@ -403,27 +438,18 @@ function createGridTemplateColumnsString(columns) {
   return gridTemplateColumnsString.trim();
 }
 
-var flag = true;
-var flag2 = true;
-
 function createHotelCard(hotel, index) {
-  if (flag) {
-    console.log(hotel);
-    flag = false;
-  }
-
-  if (flag2 && hotel.star !== null) {
-    console.log(hotel);
-    flag2 = false;
-  }
-
   var hotelCard = document.createElement('div');
   hotelCard.classList.add('hotel-card');
   hotelCard.style.gridArea = `hotel-${index}`;
 
   var hotelCardImageHolder = document.createElement('div');
   hotelCardImageHolder.classList.add('hotel-card-image-holder');
-  hotelCardImageHolder.style.backgroundImage = `url(${hotel.propertyImage.image.url})`;
+  if (hotel.propertyImage && hotel.propertyImage.image && hotel.propertyImage.image.url) {
+    hotelCardImageHolder.style.backgroundImage = `url(${hotel.propertyImage.image.url})`;
+  } else {
+    // put a placeholder image in its place
+  }
 
   var hotelCardBody = document.createElement('div');
   hotelCardBody.classList.add('hotel-card-body');
@@ -459,7 +485,11 @@ function createHotelCard(hotel, index) {
 
   var hotelCardRatingNumber = document.createElement('div');
   hotelCardRatingNumber.classList.add('hotel-card-rating-number');
-  hotelCardRatingNumber.textContent = hotel.reviews.score.toFixed(1);
+  if (hotel.reviews.total === 0) {
+    hotelCardRatingNumber.textContent = '-';
+  } else {
+    hotelCardRatingNumber.textContent = hotel.reviews.score.toFixed(1);
+  }
 
   var hotelCardRatingOutOfText = document.createElement('div');
   hotelCardRatingOutOfText.classList.add('hotel-card-rating-out-of-text');
@@ -519,31 +549,23 @@ function createHotelCard(hotel, index) {
   hotelCardPrice.appendChild(hotelCardPriceAmount);
 
   return hotelCard;
-
-  var hotelContainer = $("<div>").addClass("box");
-
-  var hotelTitle = $("<h5>");
-  hotelTitle.append(hotel.name);
-  hotelContainer.append(hotelTitle);
-
-  var hotelDetailsContainer = $("<div>").addClass("cardDiv")
-  hotelContainer.append(hotelDetailsContainer);
-
-  var hotelDetails = "Rating: " + hotel.reviews.score + "/10" + "<br>" + "Price per night: " + hotel.price.lead.formatted;
-  hotelDetailsContainer.append(hotelDetails);
-
-  var hotelImage = $("<img>").attr("id", "imageH");
-  hotelImage.attr("src", hotel.propertyImage.image.url);
-  hotelDetailsContainer.append(hotelImage);
-
-  return hotelContainer;
 }
 
-function createHotelContainerHeader(regionName) {
-  var hotelHeader = $("<h3>");
-  hotelHeader.append("Hotels in " + regionName);
+function createHotelContainerHeader(regionName, weatherWidgets, regionimage) {
+  var hotelHeader = document.createElement('h3');
+  hotelHeader.classList.add('m-0');
+  hotelHeader.textContent = "Hotels in " + regionName;
 
-  return hotelHeader;
+  hotelSearchLocationElement.appendChild(hotelHeader);
+
+  for (widget of weatherWidgets) {
+    hotelsWidgetsContainer.appendChild(widget);
+  }
+
+  if (regionimage !== undefined) {
+    hotelsHeaderImage.style.backgroundImage = `url(${regionimage})`;
+    hotelsHeaderWrapper.style.backgroundImage = `url(${regionimage})`;
+  }
 }
 
 function createMapContainer() {
@@ -612,6 +634,7 @@ function emptyHotelContainers() {
   // emptyElement(hotelsHeaderContainer);
   emptyElement(hotelsBodyContainer);
   emptyElement(hotelSearchLocationElement);
+  emptyElement(hotelsWidgetsContainer);
 }
 
 function scrollToElement(element) {
@@ -689,7 +712,7 @@ $(".dropdown-item").on("click", function (event) {
 
 window.addEventListener('load', function () {
   hotelSearchBox.focus();
-  // searchLocationForHotels({}, 'London');
+  searchLocationForHotels({}, 'London');
 });
 
 /* Maps functionality Start */
@@ -759,75 +782,36 @@ function resetMap() {
 
 /* Maps functionality End */
 
-/* Weather functionality Start */ /*
+/* Weather functionality Start */
 
-var apiKey = '60138034af71780e3420402cea540efb';
+var weatherApiKey = '60138034af71780e3420402cea540efb';
 
 var geoApiURLPrefix = 'https://api.openweathermap.org/geo/1.0/direct?';
 var currentWeatherApiURLPrefix = 'https://api.openweathermap.org/data/2.5/weather?';
 var forecastWeatherApiURLPrefix = 'https://api.openweathermap.org/data/2.5/forecast?';
+var weatherApiImagePrefix = 'https://openweathermap.org/img/wn/';
 
+var localStorageCoordinates = [];
 var weatherApiError = ''; // non empty string when an api error occurs - globally scoped because it is accessed in numerous closures
-
-async function getLatAndLonByLocationName(location) {
-  // instantiate return object
-  var coordinates = {};
-
-  // create query string portion of URL from user input
-  var queryString = `q=${location}`;
-  // create App ID portion of URL using API key
-  var appId = `appid=${apiKey}`;
-
-  // construct url using components above
-  var url = geoApiURLPrefix + [queryString, appId].join('&');
-
-  // Attempt to perform fetch request on URL. If this returns a 404, despite being caught, Google Chrome will display this error in the browser
-
-  var response = await fetch(url);
-
-  if (!response.ok) {
-    updateApiError('An API Error occurred. Please try again later.');
-    throw new Error(response.statusText);
-  }
-
-  var locations = await response.json();
-
-  if (locations.length === 0) {
-    updateApiError('Location not found.');
-    throw new Error(`Location ${location} was not recognised.`);
-  }
-
-  var { name, lat, lon } = locations[0];
-
-  coordinates.name = name;
-  coordinates.lat = lat;
-  coordinates.lon = lon;
-
-  return coordinates;
-}
 
 async function getCurrentWeatherData(coordinates) {
   // instantiate current weather data return object
   var currentWeatherData = {};
 
   // construct url using user provided latitude and longitude
-  var url = currentWeatherApiURLPrefix + `lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}`;
+  var url = currentWeatherApiURLPrefix + `lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${weatherApiKey}`;
 
   var response = await fetch(url);
 
   if (!response.ok) {
     updateApiError('An API Error occurred. Please try again later.');
-    throw new Error(response.statusText);
   }
 
   var weatherData = await response.json();
-
-  // offset date to show weather-local timezone despite dayjs being configured to user-local timezone
-  var date = dayjs(weatherData.dt * 1000 + weatherData.timezone * 1000 + timezoneOffset * 60 * 1000);
+  console.log(weatherData);
 
   currentWeatherData.location = coordinates.name;
-  currentWeatherData.date = date;
-  currentWeatherData.temperature = convertTemperatureInKtoC(weatherData.main.temp).toFixed(2); // API returns weather in Kelvin so we convert to Celsius using a helper function before returning
+  currentWeatherData.temperature = convertTemperatureInKtoC(weatherData.main.temp).toFixed(0); // API returns weather in Kelvin so we convert to Celsius using a helper function before returning
   currentWeatherData.wind = convertMpsToKph(weatherData.wind.speed).toFixed(2); // API returns m/s so we convert to kph first
   currentWeatherData.humidity = weatherData.main.humidity;
   currentWeatherData.weatherIcons = weatherData.weather.map(condition => condition.icon);
@@ -835,41 +819,14 @@ async function getCurrentWeatherData(coordinates) {
   return currentWeatherData;
 }
 
-function getLocationCoordinatesFromLocalStorage(location) {
-  var locationTrimmedToLowerCase = location.trim().toLowerCase();
-  renderPreviouslySearchedLocations();
-
-  var coordinates = localStorageCoordinates.find((element) => element.trimmedName === locationTrimmedToLowerCase);
-
-  // Move coordinates to end of the storage so they appear first in history list even
-  if (coordinates !== undefined) {
-    localStorageCoordinates = localStorageCoordinates.filter(element => element.trimmedName !== locationTrimmedToLowerCase);
-
-    localStorageCoordinates.push(coordinates);
-    saveLocationCoordinatesToLocalStorage();
-  }
-
-  return coordinates;
+function convertTemperatureInKtoC(temperature) {
+  return temperature - 273.15;
 }
 
-function addLocationCoordinatesToLocalStorage(location, coordinates) {
-  var locationTrimmedToLowerCase = location.trim().toLowerCase();
+function convertMpsToKph(mps) {
+  // convert meters per second to kilometers per hour
 
-  if (getLocationCoordinatesFromLocalStorage(location) !== undefined) {
-    return;
-  }
-
-  coordinates.trimmedName = locationTrimmedToLowerCase;
-
-  localStorageCoordinates.push(coordinates);
-  saveLocationCoordinatesToLocalStorage();
-}
-
-function saveLocationCoordinatesToLocalStorage() {
-  var localStorageCoordinatesStringified = JSON.stringify(localStorageCoordinates);
-
-  localStorage.setItem('coordinates', localStorageCoordinatesStringified);
-  renderPreviouslySearchedLocations();
+  return mps * 3.6;
 }
 
 function updateWeatherApiError(newError) {
@@ -878,4 +835,121 @@ function updateWeatherApiError(newError) {
   }
 }
 
+async function createWeatherWidgets(coordinates) {
+  var weatherWidgets = [];
+
+  try {
+    var weatherData = await getCurrentWeatherData(coordinates);
+  } catch (error) {
+    console.log(error);
+
+    return weatherWidgets;
+  }
+
+  var temperatureWidget = document.createElement('div');
+  var weatherIconWidget = document.createElement('div');
+
+  temperatureWidget.classList.add('hotel-widget', 'hotel-widget-temperature', 'subtle-shadow');
+  weatherIconWidget.classList.add('hotel-widget', 'hotel-widget-weather-icon', 'subtle-shadow');
+
+  var temperatureWidgetTemperature = document.createElement('div');
+  var temperatureWidgetDegreesCelsius = document.createElement('div');
+
+  temperatureWidget.appendChild(temperatureWidgetTemperature);
+  temperatureWidget.appendChild(temperatureWidgetDegreesCelsius);
+
+  temperatureWidgetTemperature.classList.add('hotel-widget-temperature-temperature', 'fs-1', 'fw-bold');
+
+  temperatureWidgetDegreesCelsius.classList.add('hotel-widget-temperature-degrees-c');
+
+  if (weatherData.temperature.toString().length === 1) {
+    temperatureWidgetDegreesCelsius.classList.add('single-digit-temperature');
+  };
+
+  temperatureWidgetTemperature.textContent = `${weatherData.temperature}`;
+  temperatureWidgetDegreesCelsius.textContent = '°c';
+
+  weatherWidgets.push(temperatureWidget);
+
+  if (weatherData.weatherIcons && weatherData.weatherIcons.length > 0) {
+    weatherIconWidget.style.backgroundImage = `url(${weatherApiImagePrefix}${weatherData.weatherIcons[0]}@2x.png)`;
+
+    weatherWidgets.push(weatherIconWidget);
+  }
+
+  return weatherWidgets;
+}
+
 /* Weather functionality End */
+
+/* Images API */
+var pexelsApiKey = 'dtrWFUVjWibbygEarHZzUstSDs1kDpr5NdXVVFP1aXcXT0Vu1u5vF7es';
+var pexelsApiBaseURL = 'https://api.pexels.com/v1';
+
+async function getImageBasedOnString(string) {
+  var imageFromLocalStorage = getImageBasedOnStringFromLocalStorage(string);
+
+  if (imageFromLocalStorage !== undefined) {
+    return imageFromLocalStorage;
+  }
+
+  console.log(`Searching API for images matching: "${string}"`);
+
+  var url = `${pexelsApiBaseURL}/search?query=${string}&orientation=square`;
+  var corsUrl = `${corsProxyURLPrefix}${encodeURIComponent(url)}`;
+
+  var pexelsApiOptions = {
+    method: 'GET',
+    headers: {
+      'Authorization': pexelsApiKey,
+    }
+  }
+
+  var response = await fetch(corsUrl, pexelsApiOptions);
+  var decodedResponse = await response.json();
+
+  if (decodedResponse.total_results === 0) {
+    return undefined;
+  }
+
+  var images = decodedResponse.photos.map(photo => photo.src.large2x);
+  addImageSearchToLocalStorage(string, images);
+
+  return getRandomElementFromArray(images);
+}
+
+function getImageBasedOnStringFromLocalStorage(string) {
+  var images = imagesSearchData[string];
+
+  if (images === undefined) {
+    return undefined;
+  }
+
+  console.log(`Image for search string: "${string}" retrieved from local storage.`)
+
+  var image = getRandomElementFromArray(images);
+
+  return image;
+}
+
+function addImageSearchToLocalStorage(string, images) {
+  if (imagesSearchData[string] === undefined) {
+    imagesSearchData[string] = [];
+  }
+
+  for (image of images) {
+    imagesSearchData[string].push(image);
+  }
+
+  saveDataToLocalStorage(saveOptions.images);
+
+  console.log(`Saved images for string: "${string}" to local storage.`)
+}
+
+/* Images API End */
+
+function getRandomElementFromArray(array) {
+  // placeholder just return the 0th element
+
+  return array[0];
+}
