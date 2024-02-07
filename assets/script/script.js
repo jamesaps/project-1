@@ -48,7 +48,7 @@ var saveOptions = {
 var searchTermsData = {}; // { searchTerm: regionId }
 var regionsData = {}; // { regionId: [{id, name}]}
 var hotelsData = {}; // { regionId: [hotel+options] }
-var imagesSearchData = {}; // { keyword: [url] }
+var imagesSearchData = {}; // { keyword: [{src, avgColor}] }
 
 loadDataFromLocalStorage();
 
@@ -131,7 +131,9 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
     ]
   );
 
-  renderHotels(regionDetails.name, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay);
+  colorWeatherWidgetsByBackgroundColor(weatherWidgets, regionImage.avgColor);
+
+  renderHotels(regionDetails.name, weatherWidgets, regionImage.src, hotels, numberOfHotelsToDisplay);
 
   takePageOutOfLoadingState();
 
@@ -889,7 +891,8 @@ async function getImagesBasedOnString(string) {
 
   var imageFromLocalStorage = getImagesBasedOnStringFromLocalStorage(string);
 
-  var choosePexels = new Set(['london'])
+  var choosePexels = new Set();
+  // choosePexels.add('London');
 
   if (imageFromLocalStorage !== undefined) {
     return imageFromLocalStorage;
@@ -937,7 +940,7 @@ async function getImagesBasedOnStringPexels(string) {
     return undefined;
   }
 
-  var images = decodedResponse.photos.map(photo => photo.src.large2x);
+  var images = decodedResponse.photos.map(photo => ({ src: photo.src.large2x, avgColor: photo.avg_color }));
 
   return images;
 }
@@ -983,7 +986,7 @@ var unsplashApiOptions = {
 }
 
 async function getImageBasedOnStringUnsplash(string) {
-  var url = `${unsplashApiBaseURL}/search/photos?query=${string}&orientation=squarish`;
+  var url = `${unsplashApiBaseURL}/search/photos?query=${string}`;
   var corsUrl = `${corsProxyURLPrefix}${encodeURIComponent(url)}`;
 
   var response = await fetch(corsUrl, unsplashApiOptions);
@@ -1007,7 +1010,7 @@ async function getImageBasedOnStringUnsplash(string) {
     return undefined;
   }
 
-  return [data2.urls.raw];
+  return [{ src: data2.urls.raw, avgColor: data2.color }];
 }
 
 /* Images API End */
@@ -1017,3 +1020,55 @@ function getRandomElementFromArray(array) {
 
   return array[0];
 }
+
+function colorWeatherWidgetsByBackgroundColor(weatherWidgets, avgColor) {
+  var contrastColor;
+
+  return;
+
+  try {
+    contrastColor = getTextColor(avgColor);
+  } catch (error) {
+    contrastColor = 'black';
+  }
+
+  for (weatherWidget of weatherWidgets) {
+    weatherWidget.classList.add(`hotel-widget-${contrastColor}`);
+    weatherWidget.style.color = avgColor;
+  }
+}
+
+/** START: https://wunnle.com/dynamic-text-color-based-on-background  **/
+
+function getRGB(c) {
+  return parseInt(c, 16) || c
+}
+
+function getsRGB(c) {
+  return getRGB(c) / 255 <= 0.03928
+    ? getRGB(c) / 255 / 12.92
+    : Math.pow((getRGB(c) / 255 + 0.055) / 1.055, 2.4)
+}
+
+function getLuminance(hexColor) {
+  return (
+    0.2126 * getsRGB(hexColor.substr(1, 2)) +
+    0.7152 * getsRGB(hexColor.substr(3, 2)) +
+    0.0722 * getsRGB(hexColor.substr(-2))
+  )
+}
+
+function getContrast(f, b) {
+  const L1 = getLuminance(f)
+  const L2 = getLuminance(b)
+  return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05)
+}
+
+function getTextColor(bgColor) {
+  const whiteContrast = getContrast(bgColor, '#ffffff')
+  const blackContrast = getContrast(bgColor, '#000000')
+
+  return whiteContrast > blackContrast ? 'white' : 'black'
+}
+
+/** END: https://wunnle.com/dynamic-text-color-based-on-background  **/
