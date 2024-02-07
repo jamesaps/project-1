@@ -626,7 +626,7 @@ function createCarouselItem(src, appendTo, active = false, captionHead = '', cap
     carouselItem.classList.add('active');
   }
 
-  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 object-fit-fill prominent-section" alt="${alt}">
+  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 object-fit-contain prominent-section" alt="${alt}">
   <div class="carousel-caption d-none d-md-block">
     <h5>${captionHead}</h5>
     <p>${captionBody}</p>
@@ -1053,7 +1053,7 @@ async function getImagesBasedOnString(string) {
   // choosePexels.add('London');
 
   if (imageFromLocalStorage !== undefined) {
-    return imageFromLocalStorage;
+    return getRandomElementFromArray(imageFromLocalStorage);
   }
 
   var images;
@@ -1115,6 +1115,8 @@ function getImagesBasedOnStringFromLocalStorage(string) {
   if (!images || images.length === 0) {
     return undefined;
   }
+
+  console.log(images)
 
   console.log(`Image for search string: "${string}" retrieved from local storage.`)
 
