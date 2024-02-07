@@ -7,7 +7,6 @@ This user-friendly application serves as the ultimate guide, offering a comprehe
 We have additionally incorporated a map feature for effortless navigation to these spaces. 
 
 Our dedication to a streamlined and simplified user experience led us to develop this as a one-page application, ensuring intuitive usability and a smooth customer journey.
-Users can also sign up to receive Updates on new App Features.
 
 
 ## Travel App Usage/Visuals
