@@ -27,7 +27,7 @@ var corsProxyURLPrefix = 'https://corsproxy.io/?';
 
 var hotelMapMarkers = {};
 
-var numberOfHotelsToDisplay = 8;
+var numberOfHotelsToDisplayPerPage = 7;
 
 var map;
 var mapContainer;
@@ -135,11 +135,11 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
 
   colorWeatherWidgetsByBackgroundColor(weatherWidgets, regionImage.avgColor);
 
-  renderHotels(regionDetails.name, weatherWidgets, regionImage.src, hotels, numberOfHotelsToDisplay);
+  renderHotels(regionDetails.name, weatherWidgets, regionImage.src, hotels, numberOfHotelsToDisplayPerPage);
 
   takePageOutOfLoadingState();
 
-  updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplay);
+  updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplayPerPage);
   scrollToElement(hotelsHeaderContainer);
 }
 
@@ -154,9 +154,6 @@ async function getRegionDetailsByLocationName(searchTerm) {
 
   var response = await fetch(url, apiOptions);
   var decodedResponse = await response.json();
-
-  console.log('********')
-  console.log(decodedResponse);
 
   console.log(`Made an API call to retrieve location details for search term: "${searchTerm}".`);
 
@@ -290,12 +287,12 @@ function addHotelsToLocalStorage(regionId, hotels, options) {
   console.log(`Saved hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)} to local storage.`)
 }
 
-function renderHotels(regionName, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplay) {
+function renderHotels(regionName, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplayPerPage) {
   emptyHotelContainers();
 
   createHotelContainerHeader(regionName, weatherWidgets, regionImage);
 
-  createHotelGrid(hotels);
+  createHotelGrid(hotels.slice(0, numberOfHotelsToDisplay));
 }
 
 function createHotelGrid(hotels, columns = 4) {
