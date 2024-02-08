@@ -163,7 +163,7 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
   renderHotels(regionDetails.name, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplayPerPage);
   takePageOutOfLoadingState();
   updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplayPerPage);
-  scrollToElement(hotelsHeaderContainer);
+  scrollToElement(jumbotronContainer);
 
   return true;
 }
@@ -857,7 +857,7 @@ function emptyHotelContainers() {
 }
 
 function scrollToElement(element) {
-  return;
+
   // turn off smooth scroll which interacts weirdly with scrollTop
   document.documentElement.style.setProperty('scroll-behavior', 'auto', 'important');
 
