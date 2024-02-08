@@ -183,12 +183,11 @@
      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
      color: rgb(80, 80, 80);
      font-size: 0.75rem;
-     padding: 10px;
  }
 
  @media screen and (min-width: 768px) {
-     .footer .row:first-child {
-         padding-left: 10px;
+     .footer .row {
+         padding: 10px;
      }
  }
 
@@ -199,12 +198,6 @@
  .subscribe-form-element {
      font-size: 0.6rem;
      border-radius: 0;
- }
-
- @media screen and (min-width: 768px) {
-     footer .row .footer-column:last-child {
-         padding-right: 10px;
-     }
  }
 
  #newletter-subscription {
