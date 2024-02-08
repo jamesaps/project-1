@@ -485,7 +485,7 @@ function createHotelCard(hotel, index) {
     showHotelModal(hotel, index);
   });
 
-  hotelCard.id = `hotel-${index} `;
+  hotelCard.id = `hotel-${index}`;
   hotelCard.classList.add('hotel-card');
   hotelCard.style.gridArea = `hotel-${index}`;
 
