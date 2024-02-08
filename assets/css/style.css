@@ -289,14 +289,13 @@
 
  #dropDown {
      /* display:none; */
-     margin-left: 50px;
  }
 
- @media screen and (max-width: 768px) {
-     #dropDown {
-         margin-left: 20px;
-     }
+ #dropdownMenuButton1 {
+     background-color: var(--color-4);
  }
+
+
 
  /* Loading spinner */
  #hotel-search-loading-spinner-container {
@@ -528,7 +527,8 @@
      border-radius: 5px;
  }
 
- #hotels-header-container {
+ #hotels-header-container,
+ #hotels-toolbar-container {
      padding: 10px;
      padding-top: 0;
      /* background-color: var(--color-6); */
@@ -552,7 +552,15 @@
 
  #hotels-header-details {
      display: flex;
-     justify-content: space-between;
+ }
+
+ #right-hotel-header-container:after {
+     content: '\200b';
+ }
+
+ .header-detail:not(:nth-child(2)) {
+     flex-basis: 0;
+     flex-grow: 1;
  }
 
  /* Hotel Cards */
@@ -561,7 +569,8 @@
  #hotels-widgets-container {
      display: flex;
      align-items: start;
-     gap: 10px
+     gap: 10px;
+     margin-right: 10px;
  }
 
  #hotels-location {

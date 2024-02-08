@@ -98,28 +98,29 @@
 
   <!-- Hotels cards  -->
   <div id="hotels-header-container" class="d-none container-fluid">
-    <div id="hotels-header-wrapper" class="position-relative">
+    <div id="hotels-header-wrapper">
       <div id="hotels-header-image" class="d-none"></div>
-      <div id="hotels-header-details" class="">
-        <div id="hotels-widgets-container" class="">1</div>
-        <div id="hotels-location" class="position-absolute start-50 translate-middle-x subtle-shadow"></div>
-        <div id="right-hotel-header-container" class=""></div>
+      <div id="hotels-header-details">
+        <div id="hotels-widgets-container" class="header-detail d-flex flex-fill-1">1</div>
+        <div id="hotels-location" class="header-detail subtle-shadow d-flex"></div>
+        <div id="right-hotel-header-container" class="header-detail"></div>
       </div>
     </div>
+  </div>
 
-    <div class="row justify-content-start">
-      <div class="col-12">
-        <div class="dropdown" id="dropDown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            FILTER
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" style="">
-            <li><a class="dropdown-item" id="item1" data-index="REVIEW">REVIEW</a></li>
-            <li><a class="dropdown-item" id="item2" data-index="RECOMMENDED">RECOMMENDED</a></li>
-            <li><a class="dropdown-item" id="item3" data-index="DISTANCE">DISTANCE</a></li>
-          </ul>
-        </div>
+  <div id="hotels-toolbar-container" class="container-fluid">
+    <div class="col-12 d-flex justify-content-center">
+      <div class="dropdown" id="dropDown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          FILTER
+        </button>
+
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" id="item1" href="#" data-index="REVIEW">REVIEW</a></li>
+          <li><a class="dropdown-item" id="item2" href="#" data-index="RECOMMENDED">RECOMMENDED</a></li>
+          <li><a class="dropdown-item" id="item3" href="#" data-index="DISTANCE">DISTANCE</a></li>
+        </ul>
       </div>
     </div>
   </div>
@@ -218,7 +219,7 @@
                 <div id="carousel"
                   class="carousel carousel-dark slide position-relative prominent-section overflow-hidden"
                   data-bs-ride="carousel">
-                  <div id="carousel-inner" class="carousel-inner h-100 d-flex flex-column"></div>
+                  <div id="carousel-inner" class="carousel-inner h-100 d-flex"></div>
 
                   <div class="col-12 mt-4 position-absolute bottom-0 ">
                     <ul id="carousel-list" class="list-group list-group-horizontal">
@@ -235,7 +236,7 @@
                   </div>
                 </div>
               </div>
-              <div id="modal-map-container" class="col-md-6">Map</div>
+              <div id="modal-map-container" class="col-md-6 mt-4 mt-md-0">Map</div>
             </div>
             <div id="modal-recommendations" class="row mt-4">
               <div class="col-12">
@@ -267,13 +268,6 @@
       v: "weekly",
     });
   </script>
-
-
-
-
-
-
-
 
   <!-- Popper.js, Bootstrap JS, Font Awesome, Leaflet JS, Day JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

@@ -133,7 +133,6 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
   hotelSearchBox.blur();
 
   putPageIntoLoadingState();
-  emptyHotelContainers();
 
   await simulateNetworkCall();
 
@@ -151,11 +150,9 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
   // console.log(regionImage)
 
   colorWeatherWidgetsByBackgroundColor(weatherWidgets, regionImage.avgColor);
-
-  renderHotels(regionDetails.name, weatherWidgets, regionImage.src, hotels, numberOfHotelsToDisplayPerPage);
-
+  emptyHotelContainers();
+  renderHotels(regionDetails.name, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplayPerPage);
   takePageOutOfLoadingState();
-
   updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplayPerPage);
   scrollToElement(hotelsHeaderContainer);
 }
@@ -332,6 +329,22 @@ function createGridTemplateAreasString(hotels, columns) {
   var hotelIndex = 0;
   var hotelIndexSmallScreen = 0;
 
+  // Hotels appear before map on small screens
+  while (hotelIndexSmallScreen < hotels.length) {
+    var templateRowSmallScreen = [];
+
+    if (hotelIndexSmallScreen < hotels.length) {
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
+
+      gridTemplateAreasSmallerScreens.push(templateRowSmallScreen);
+    }
+
+    hotelIndexSmallScreen += 1;
+  }
+
   for (var i = 0; i < mapRowSpan; ++i) { // create a square space spanning mapSpan x mapSpan rows and columns in the top right of the grid
     var templateRow = [];
     var templateRowSmallScreen = [];
@@ -356,21 +369,6 @@ function createGridTemplateAreasString(hotels, columns) {
 
     gridTemplateAreas.push(templateRow);
     gridTemplateAreasSmallerScreens.push(templateRowSmallScreen);
-  }
-
-  while (hotelIndexSmallScreen < hotels.length) {
-    var templateRowSmallScreen = [];
-
-    if (hotelIndexSmallScreen < hotels.length) {
-      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
-      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
-      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
-      templateRowSmallScreen.push(`hotel-${hotelIndexSmallScreen}`);
-
-      gridTemplateAreasSmallerScreens.push(templateRowSmallScreen);
-    }
-
-    hotelIndexSmallScreen += 1;
   }
 
   while (hotelIndex < hotels.length) { // fill the rest of the grid with remaining hotels that need to be rendered
@@ -606,6 +604,7 @@ async function showHotelModal(hotel) {
   var mainImageValid = false;
   if (hotel.propertyImage && hotel.propertyImage.image && hotel.propertyImage.image.url) {
     createCarouselItem(hotel.propertyImage.image.url, carouselInner, true);
+    mainImageValid = true;
   }
 
   if (hotel.propertyImage && hotel.propertyImage.fallbackImage && hotel.propertyImage.fallbackImage.url) {
@@ -664,7 +663,7 @@ function renderRecommendationsToModal(recommendations, appendTo) {
 
   for (var [category, details] of Object.entries(recommendations)) {
     var categoryContainer = document.createElement('div');
-    categoryContainer.classList.add('col-6', 'col-lg-3', 'mb-4');
+    categoryContainer.classList.add('col-12', 'col-lg-6', 'mb-4');
     appendTo.appendChild(categoryContainer);
 
     var categoryHeading = document.createElement('h3');
@@ -688,18 +687,18 @@ function renderRecommendationsToModal(recommendations, appendTo) {
 
 function createCarouselItem(src, appendTo, active = false, captionHead = '', captionBody = '', alt = '') {
   var carouselItem = document.createElement('div');
-  carouselItem.classList.add('carousel-item', 'flex-grow-1');
+  carouselItem.classList.add('carousel-item');
   carouselItem.setAttribute('data-bs-interval', '10000');
 
   if (active) {
     carouselItem.classList.add('active');
   }
 
-  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 h-100 object-fit-cover" alt="${alt}">
-  <div class="carousel-caption d-none d-md-block">
-    <h5>${captionHead}</h5>
-    <p>${captionBody}</p>
-  </div>`;
+  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 h-100 object-fit-cover" alt="${alt}">`;
+  // carouselItem.innerHTML += `<div class="carousel-caption d-none d-md-block">
+  //   <h5>${captionHead}</h5>
+  //   <p>${captionBody}</p>
+  // </div>`
 
   appendTo.appendChild(carouselItem);
 }
@@ -738,8 +737,8 @@ function createHotelContainerHeader(regionName, weatherWidgets, regionImage) {
   console.log(regionImage)
 
   if (regionImage !== undefined) {
-    hotelsHeaderImage.style.backgroundImage = `url(${regionImage})`;
-    hotelsHeaderWrapper.style.backgroundImage = `url(${regionImage})`;
+    hotelsHeaderImage.style.backgroundImage = `url(${regionImage.src})`;
+    hotelsHeaderWrapper.style.backgroundImage = `url(${regionImage.src})`;
   }
 }
 
@@ -761,10 +760,12 @@ function createMapContainer() {
 function putPageIntoLoadingState() {
   showElement(loadingSpinnerContainer);
   hideElement(hotelSearchIcon);
-  hideElement(hotelsHeaderContainer);
-  hideElement(hotelsBodyContainer);
+  // hideElement(hotelsHeaderContainer);
+  // hideElement(hotelsBodyContainer);
+  makeFaint(hotelsHeaderContainer);
+  makeFaint(hotelsBodyContainer);
   hotelSearchButton.disabled = true;
-  hideElement(mapContainer);
+  // hideElement(mapContainer);
 
   loading = true;
 }
@@ -774,6 +775,8 @@ function takePageOutOfLoadingState() {
   showElement(hotelSearchIcon);
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
+  makeNotFaint(hotelsHeaderContainer);
+  makeNotFaint(hotelsBodyContainer);
   hotelSearchButton.disabled = false;
   showElement(mapContainer);
   // clearSearchBar();
@@ -781,6 +784,22 @@ function takePageOutOfLoadingState() {
   dockJumbotron();
 
   loading = false;
+}
+
+function makeFaint(element) {
+  if (element === undefined || element === null) {
+    return;
+  }
+
+  element.style.opacity = 0.3;
+}
+
+function makeNotFaint(element) {
+  if (element === undefined || element === null) {
+    return;
+  }
+
+  element.style.opacity = null;
 }
 
 function hideElement(element) {
@@ -1242,7 +1261,7 @@ async function getImageBasedOnStringUnsplash(string) {
       return undefined;
     }
 
-    return [{ src: data2.urls.raw, avgColor: data2.color }];
+    return [{ src: data2.urls.raw, avgColor: data2.color, blurHash: data2.blur_hash }];
   } catch (error) {
     console.log(error);
     return undefined;
