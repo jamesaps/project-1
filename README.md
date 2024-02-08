@@ -23,9 +23,6 @@ Our dedication to a streamlined and simplified user experience led us to develop
 
 ![Details of Eg Restaurants](./assets/images/recommendations.png)
 
-![Gif Navigiating the App]()
-
-
 ## Support
 For support with App Features email: Company@domain.com
 

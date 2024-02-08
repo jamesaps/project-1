@@ -676,3 +676,7 @@
      bottom: 0;
      left: 10px
  }
+
+ .dropdown-menu {
+     z-index: 1001;
+ }
