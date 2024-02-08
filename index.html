@@ -218,13 +218,19 @@
                 <div id="carousel"
                   class="carousel carousel-dark slide position-relative prominent-section overflow-hidden"
                   data-bs-ride="carousel">
-                  <div id="carousel-inner" class="carousel-inner"></div>
+                  <div id="carousel-inner" class="carousel-inner h-100 d-flex flex-column"></div>
 
                   <div class="col-12 mt-4 position-absolute bottom-0 ">
                     <ul id="carousel-list" class="list-group list-group-horizontal">
-                      <li class="list-group-item flex-fill modal-price"></li>
-                      <li class="list-group-item flex-fill modal-rating"></li>
-                      <li class="list-group-item flex-fill modal-reviews"></li>
+                      <li id="modal-price"
+                        class="list-group-item flex-fill modal-price d-flex flex-column text-center justify-content-center">
+                      </li>
+                      <li id="modal-rating"
+                        class="list-group-item flex-fill modal-rating d-flex flex-column text-center justify-content-center">
+                      </li>
+                      <li id="modal-reviews"
+                        class="list-group-item flex-fill modal-reviews d-flex flex-column text-center justify-content-center">
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -254,7 +260,13 @@
   </div>
   <!-- Modal End-->
 
-
+  <!-- Google API Script -->
+  <script>
+    (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
+      key: "AIzaSyBJNC4LwGW7sqqe3MY_8oIwhb4qy-A1viQ",
+      v: "weekly",
+    });
+  </script>
 
 
 

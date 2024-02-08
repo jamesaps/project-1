@@ -33,6 +33,9 @@ var map;
 var modalMap;
 var mapContainer;
 
+//--> Creates an info window to share between markers.
+var infoWindow;
+
 var apiOptions = {
   method: 'GET',
   headers: {
@@ -145,7 +148,7 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
     ]
   );
 
-  console.log(regionImage)
+  // console.log(regionImage)
 
   colorWeatherWidgetsByBackgroundColor(weatherWidgets, regionImage.avgColor);
 
@@ -280,7 +283,7 @@ async function getHotelsByRegionId(regionId, options = {}) {
 
 function getHotelsByRegionIdFromLocalStorage(regionId, options) {
   var hotelsKey = createHotelsSearchKey(regionId, options);
-  console.log(hotelsKey)
+  // console.log(hotelsKey)
   var hotels = hotelsData[hotelsKey];
 
   if (hotels === undefined) {
@@ -303,10 +306,7 @@ function addHotelsToLocalStorage(regionId, hotels, options) {
 
 function renderHotels(regionName, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplayPerPage) {
   emptyHotelContainers();
-
-  console.log(regionImage)
   createHotelContainerHeader(regionName, weatherWidgets, regionImage);
-
   createHotelGrid(hotels.slice(0, numberOfHotelsToDisplay));
 }
 
@@ -517,10 +517,12 @@ function createHotelCard(hotel, index) {
 
   var hotelCardRatingNumber = document.createElement('div');
   hotelCardRatingNumber.classList.add('hotel-card-rating-number');
-  if (hotel.reviews.total === 0) {
-    hotelCardRatingNumber.textContent = '-';
-  } else {
-    hotelCardRatingNumber.textContent = hotel.reviews.score.toFixed(1);
+  if (hotel.reviews && hotel.reviews.score) {
+    if (hotel.reviews.score === 0) {
+      hotelCardRatingNumber.textContent = '-';
+    } else {
+      hotelCardRatingNumber.textContent = hotel.reviews.score.toFixed(1);
+    }
   }
 
   var hotelCardRatingOutOfText = document.createElement('div');
@@ -610,6 +612,34 @@ async function showHotelModal(hotel) {
     createCarouselItem(hotel.propertyImage.fallbackImage.url, carouselInner, !mainImageValid);
   }
 
+  var modalPrice = document.getElementById('modal-price');
+  if (hotel.price && hotel.price.lead && hotel.price.lead.amount) {
+    var price = hotel.price.lead.amount.toFixed(2);
+    modalPrice.innerHTML = `<div>$${price}</div><small>per night</small>`;
+  }
+
+  var modalRating = document.getElementById('modal-rating');
+  var rating;
+  if (hotel.reviews && hotel.reviews.score) {
+    if (hotel.reviews.score === 0) {
+      rating = '-';
+    } else {
+      rating = hotel.reviews.score.toFixed(1);
+    }
+    modalRating.innerHTML = `<div>${rating}</div><small>RATING</small>`;
+  }
+
+  var modalReviews = document.getElementById('modal-reviews');
+  var reviews;
+  if (hotel.reviews && hotel.reviews.total) {
+    if (hotel.reviews.total === 0) {
+      reviews = '-';
+    } else {
+      reviews = hotel.reviews.total
+    }
+    modalReviews.innerHTML = `<div>${reviews}</div><div>REVIEWS</div>`;
+  }
+
   bsModal.show();
 
   var modalMapElement = document.createElement('div');
@@ -617,17 +647,9 @@ async function showHotelModal(hotel) {
   modalMapElement.id = 'modal-map';
   modalMapContainer.appendChild(modalMapElement);
 
-  modalMap = L.map('modal-map').setView([51.05, -0.09], 13);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(modalMap);
+  var recommendations = await getRecommendationsNearLocation({ latitude, longitude });
 
-  modal.addEventListener('shown.bs.modal', () => {
-    modalMap.invalidateSize();
-  });
-
-  var recommendations = await getRecommendationsNearLocation(hotelCoordinates);
+  showModalMap(hotel.name, { lat: latitude, lng: longitude }, recommendations);
 
   renderRecommendationsToModal(recommendations, recommendationsContainer);
 }
@@ -640,25 +662,24 @@ function renderRecommendationsToModal(recommendations, appendTo) {
   titleContainer.innerHTML = '<h2>Here are some points of interest near the hotel</h2>';
   appendTo.appendChild(titleContainer);
 
-  for ([category, locations] of Object.entries(recommendations)) {
+  for (var [category, details] of Object.entries(recommendations)) {
     var categoryContainer = document.createElement('div');
     categoryContainer.classList.add('col-6', 'col-lg-3', 'mb-4');
     appendTo.appendChild(categoryContainer);
 
     var categoryHeading = document.createElement('h3');
     categoryHeading.classList.add('fs-4', 'text-center');
-    categoryHeading.textContent = category;
+    categoryHeading.textContent = details.title;
     categoryContainer.appendChild(categoryHeading);
 
     var categoryListGroup = document.createElement('ul');
-    categoryListGroup.classList.add('list-group', 'h-100');
+    categoryListGroup.classList.add('list-group');
     categoryContainer.appendChild(categoryListGroup);
 
-    for (loc of locations) {
-      console.log(loc)
+    for (var loc of details.locations) {
       var categoryLocationListItem = document.createElement('div');
       categoryLocationListItem.classList.add('list-group-item', 'flex-fill');
-      categoryLocationListItem.innerHTML = `${loc.name} <span class="modal-location-distance">${loc.dist.toFixed(0)}m</span>`;
+      categoryLocationListItem.innerHTML = `${loc.name} <span class="modal-location-distance badge bg-secondary">${loc.dist.toFixed(0)}m</span>`;
 
       categoryListGroup.appendChild(categoryLocationListItem);
     }
@@ -667,14 +688,14 @@ function renderRecommendationsToModal(recommendations, appendTo) {
 
 function createCarouselItem(src, appendTo, active = false, captionHead = '', captionBody = '', alt = '') {
   var carouselItem = document.createElement('div');
-  carouselItem.classList.add('carousel-item');
-  carouselItem.setAttribute('data-bs-interval', 3000);
+  carouselItem.classList.add('carousel-item', 'flex-grow-1');
+  carouselItem.setAttribute('data-bs-interval', '10000');
 
   if (active) {
     carouselItem.classList.add('active');
   }
 
-  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 object-fit-cover prominent-section" alt="${alt}">
+  carouselItem.innerHTML = `<img src="${src}" class="d-block w-100 h-100 object-fit-cover" alt="${alt}">
   <div class="carousel-caption d-none d-md-block">
     <h5>${captionHead}</h5>
     <p>${captionBody}</p>
@@ -1164,8 +1185,6 @@ function getImagesBasedOnStringFromLocalStorage(string) {
     return undefined;
   }
 
-  console.log(images)
-
   console.log(`Image for search string: "${string}" retrieved from local storage.`)
 
   // var image = getRandomElementFromArray(images);
@@ -1207,8 +1226,6 @@ async function getImageBasedOnStringUnsplash(string) {
     var response = await fetch(corsUrl, unsplashApiOptions);
     var data = await response.json();
 
-    console.log(data);
-
     if (data.results.length === 0) {
       return undefined;
     }
@@ -1220,8 +1237,6 @@ async function getImageBasedOnStringUnsplash(string) {
 
     var response2 = await fetch(corsUrl, unsplashApiOptions);
     var data2 = await response2.json();
-
-    console.log(data2);
 
     if (!data2.id) {
       return undefined;
@@ -1330,10 +1345,23 @@ async function getRecommendationsNearLocation(coordinates) {
     return localStorageRecommendations;
   }
 
-  const cafeRest = "cafes,restaurants";
-  const barPub = "bars,pubs";
-  const entertainment = "amusements,sport,casino,theatres_and_entertainments";
-  const culture = "museums,historic_architecture,towers,historical_places,monuments_and_memorials";
+  const cafeRest = {
+    title: 'Restaurants🍴😋',
+    searchKeywords: "cafes,restaurants",
+
+  };
+  const barPub = {
+    title: 'Bars and Pubs 🍸🍻',
+    searchKeywords: "bars,pubs"
+  };
+  const entertainment = {
+    title: 'Entertainment 🎉🎭',
+    searchKeywords: "amusements,sport,casino,theatres_and_entertainments"
+  }
+  const culture = {
+    title: 'Culture 🖼️🏛️',
+    searchKeywords: "museums,historic_architecture,towers,historical_places,monuments_and_memorials"
+  }
 
   var categories = { cafeRest, barPub, entertainment, culture };
   var recommendations = await getRecommendationsForCategories(categories, coordinates);
@@ -1344,22 +1372,22 @@ async function getRecommendationsNearLocation(coordinates) {
 }
 
 async function getRecommendationsForCategories(categories, coordinates) {
-  var recommendationsAsArray = await Promise.all(Object.entries(categories).map(async ([category, activities]) => {
+  var recommendationsAsArray = await Promise.all(Object.entries(categories).map(async ([category, categoryDetails]) => {
     return {
       category,
-      placesToGo: await getRecommendationsForActivitiesByLocation(activities, coordinates),
+      title: categoryDetails.title,
+      locations: await getRecommendationsForActivitiesByLocation(categoryDetails.searchKeywords, coordinates),
     }
   }));
-
-  console.log(recommendationsAsArray)
 
   var recommendations = {};
 
   for (recommendation of recommendationsAsArray) {
     var category = recommendation.category;
-    var placesToGo = recommendation.placesToGo;
+    var title = recommendation.title;
+    var locations = recommendation.locations;
 
-    recommendations[category] = placesToGo;
+    recommendations[category] = { locations, title };
   }
 
   return recommendations;
@@ -1378,3 +1406,100 @@ async function getRecommendationsForActivitiesByLocation(activities, coordinates
 
 /** Local suggestions API End */
 
+async function showModalMap(hotelName, hotelLocation, recommendations, useGoogle = true) {
+  if (useGoogle) {
+    showGoogleMap(hotelName, hotelLocation, recommendations);
+  } else {
+    showLeafletMap();
+  }
+}
+
+function showLeafletMap() {
+  modalMap = L.map('modal-map').setView([51.05, -0.09], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(modalMap);
+
+  modal.addEventListener('shown.bs.modal', () => {
+    modalMap.invalidateSize();
+  });
+}
+
+/** Modal map Google Maps Start */
+async function showGoogleMap(hotelName, hotelLocation, recommendations) {
+  const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+    "marker",
+  );
+  var modalGoogleMap = new Map(document.getElementById("modal-map"), {
+    zoom: 16,
+    center: hotelLocation,
+    mapId: "4504f8b37365c3d0",
+  });
+
+  //-->Creates a hotel marker and makes it bigger than default
+  const hotelMarker = new PinElement({
+    scale: 1.3,
+  });
+
+  //--> Creates an info window to share between markers.
+  infoWindow = new InfoWindow();
+
+  const markerViewScaled = new AdvancedMarkerElement({
+    map: modalGoogleMap,
+    position: hotelLocation,
+    content: hotelMarker.element,
+    title: hotelName
+  });
+
+  markerViewScaled.addListener('click', createClickListener(hotelName, markerViewScaled));
+
+  //--> for loop iterates through categories arrays and creates a marker with a designated custom design
+  for ([category, recommendation] of Object.entries(recommendations)) {
+    var imgSrc;
+
+    switch (category) {
+      case 'cafeRest':
+        imgSrc = "./assets/images/restaurant_googleMaps_Icon.png";
+        break;
+      case 'barPub':
+        imgSrc = "./assets/images/Bar_GoogleMaps_Icon.png";
+        break;
+      case 'entertainment':
+        imgSrc = "./assets/images/entertainment_GoogleMaps_Icon.png";
+        break;
+      case 'culture':
+        imgSrc = "./assets/images/culture_GoogleMaps_Icon.png";
+        break;
+    }
+
+    for (loc of recommendation.locations) {
+      var img = document.createElement("img");
+      img.src = imgSrc
+      var locationImgView = new AdvancedMarkerElement({
+        map: modalGoogleMap,
+        position: { lat: loc.point.lat, lng: loc.point.lon },
+        content: img,
+        title: loc.name
+      });
+
+      console.log(loc)
+
+      locationImgView.addListener('click', createClickListener(loc.name, locationImgView));
+    }
+  }
+}
+
+function createClickListener(title, markerView) {
+  return ({ domEvent, latLng }) => {
+    const { target } = domEvent;
+
+    infoWindow.close();
+    infoWindow.setContent(title);
+    infoWindow.open(markerView.map, markerView);
+  };
+}
+
+
+/** Modal map Google Maps End */
