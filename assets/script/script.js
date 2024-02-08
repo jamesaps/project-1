@@ -1449,7 +1449,7 @@ function showLeafletMap() {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(modalMap);
 
-  modal.addEventListener('shown.bs.modal', () => {
+  modal.addListenerOnce('shown.bs.modal', () => {
     modalMap.invalidateSize();
   });
 }
@@ -1465,6 +1465,10 @@ async function showGoogleMap(hotelName, hotelLocation, recommendations) {
     center: hotelLocation,
     mapId: "4504f8b37365c3d0",
   });
+
+  google.maps.event.addListenerOnce(modalGoogleMap, 'tilesloaded', function () {
+    console.log('google map loaded');
+  })
 
   //-->Creates a hotel marker and makes it bigger than default
   const hotelMarker = new PinElement({
