@@ -295,7 +295,9 @@
      background-color: var(--color-4);
  }
 
-
+ .dropdown-menu.show {
+     z-index: 1001;
+ }
 
  /* Loading spinner */
  #hotel-search-loading-spinner-container {

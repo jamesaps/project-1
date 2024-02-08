@@ -928,8 +928,8 @@ var defaultMapMarker = L.ExtraMarkers.icon({
 });
 
 var highlightedMapMarker = L.ExtraMarkers.icon({
-  shape: 'star',
-  markerColor: 'yellow',
+  shape: 'circle',
+  markerColor: 'red',
   prefix: 'fa',
   icon: '',
   iconColor: '#fff',
@@ -1474,6 +1474,8 @@ async function showGoogleMap(hotelName, hotelLocation, recommendations) {
 
   markerViewScaled.addListener('click', createClickListener(hotelName, markerViewScaled));
 
+  var bounds = new google.maps.LatLngBounds();
+
   //--> for loop iterates through categories arrays and creates a marker with a designated custom design
   for ([category, recommendation] of Object.entries(recommendations)) {
     var imgSrc;
@@ -1503,10 +1505,11 @@ async function showGoogleMap(hotelName, hotelLocation, recommendations) {
         title: loc.name
       });
 
-      console.log(loc)
-
+      bounds.extend({ lat: loc.point.lat, lng: loc.point.lon });
       locationImgView.addListener('click', createClickListener(loc.name, locationImgView));
     }
+
+    modalGoogleMap.fitBounds(bounds);
   }
 }
 
