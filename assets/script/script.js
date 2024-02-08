@@ -271,7 +271,7 @@ async function getHotelsByRegionId(regionId, options = {}) {
   var response = await fetch(url, apiOptions);
   var decodedResponse = await response.json();
 
-  var hotels = decodedResponse.properties;
+  var hotels = decodedResponse.properties || [];
 
   console.log(`Made API call to retrieve hotels for Region ID: ${regionId} with options: ${JSON.stringify(options)}.`);
 
@@ -306,7 +306,12 @@ function addHotelsToLocalStorage(regionId, hotels, options) {
 function renderHotels(regionName, weatherWidgets, regionImage, hotels, numberOfHotelsToDisplay = numberOfHotelsToDisplayPerPage) {
   emptyHotelContainers();
   createHotelContainerHeader(regionName, weatherWidgets, regionImage);
-  createHotelGrid(hotels.slice(0, numberOfHotelsToDisplay));
+  if (hotels.length === 0) {
+    hotelsBodyContainer.innerHTML = `<div class="text-center">0 results</div>`;
+    return;
+  }
+
+  createHotelGrid(hotels.slice(0, Math.min(numberOfHotelsToDisplay, hotels.length)));
 }
 
 function createHotelGrid(hotels, columns = 4) {
@@ -471,7 +476,7 @@ function createHotelCard(hotel, index) {
     showHotelModal(hotel, index);
   });
 
-  hotelCard.id = `hotel-${index}`;
+  hotelCard.id = `hotel-${index} `;
   hotelCard.classList.add('hotel-card');
   hotelCard.style.gridArea = `hotel-${index}`;
 
