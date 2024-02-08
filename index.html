@@ -12,30 +12,35 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-extra-markers/1.2.2/css/leaflet.extra-markers.min.css"
+    integrity="sha512-wurszDyO1nj6ESdfrXb9h1hmoHMu3sQ3iXgKcu/p81lT+KaPGkta9NIPX7k6XXGgVYpcRHcc8AA4UIeQ7Ax/Cw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/modal.css">
 
-  <title>Travel App </title>
+  <title>Travel App</title>
 </head>
 
 <body>
   <!-- Start navigation bar -->
-  <nav class="navbar navbar-expand-lg bg-body-tertiary customNav" data-bs-theme="light">
+  <nav id="main-nav" class="navbar navbar-expand-md customNav" data-bs-theme="light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">TRAVEL APP </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <p class="navbar-toggler-icon"></p>
+        <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ml-auto">
+        <ul id="primary-nav" class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="#">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#searchBox">Search Destination</a>
+            <a class="nav-link" href="#jumbotron-container">Search Destination</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item d-none">
             <a class="nav-link" href="#Itinerary Planner">Itinerary Planner</a>
           </li>
           <li class="nav-item d-lg-none">
@@ -62,101 +67,72 @@
         </ul>
       </div>
     </div>
-    </div>
   </nav>
   <!-- End navigation bar -->
 
-
   <!-- // jumbotron and search -->
-  <div class="jumbotron">
-    <hr class="my-4">
-
-    <form id="surroundBox">
-      <h1> Where would you like to go? </h1>
-      <input type="text" id="searchBox" placeholder="Enter a city ">
-
-      <button type="submit" class="btn btn-primary btn-lg" role="button" id="searchBtn">SEARCH</button>
-    </form>
-  </div>
-  <!-- // jumbotron and search -->
-
-  <!-- Loading spinner -->
-
-  <div id="hotel-search-loading-spinner-container" class="container-fluid d-none">
-    <div id="hotel-search-loading-spinner" class="d-flex justify-content-center">
-      <div class="spinner-border text-secondary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+  <div id="jumbotron-container" class="jumbotron-container">
+    <div id="jumbotron" class="jumbotron container-fluid d-flex justify-content-center align-items-center">
+      <h1 class="jumbotron-heading d-none"><strong>Where would you like to go?</strong></h1>
+      <form id="hotel-search-form" autocomplete="off" class="col-12 col-md-8">
+        <div class="input-group position-relative">
+          <input type="text" id="hotel-search-box" class="form-control position-relative fs-4 ps-3 ps-md-5 z-1"
+            placeholder="Where would you like to go?">
+          <button type="submit" id="hotel-search-button"
+            class="btn btn-lg position-absolute top-50 end-0 translate-middle-y z-2 position-relative">
+            <i id="hotel-search-icon" class="fa-solid fa-magnifying-glass"></i>
+          </button>
+          <div id="hotel-search-loading-spinner-container"
+            class="d-none position-absolute top-50 end-0 translate-middle-y z-2 position-relative">
+            <div id="hotel-search-loading-spinner" class="d-flex justify-content-center">
+              <div id="hotel-search-spinner-border" class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
+  <!-- // jumbotron and search -->
 
   <!-- Hotels cards  -->
-  <div id="hotels-container" class="container-fluid d-none">
-    <div class="row" id="cityHotel"></div>
-    <div class="row justify-content-start">
-      <div class="col-12">
-        <div class="dropdown" id="dropDown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            FILTER
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            <li><a class="dropdown-item" id="item1" data-index="REVIEW">REVIEW</a></li>
-            <li><a class="dropdown-item" id="item2" data-index="RECOMMENDED">RECOMMENDED</a></li>
-            <li><a class="dropdown-item" id="item3" data-index="DISTANCE">DISTANCE</a></li>
-          </ul>
-        </div>
+  <div id="hotels-header-container" class="d-none container-fluid">
+    <div id="hotels-header-wrapper" class="overflow-hidden">
+      <div id="hotels-header-image" class="d-none"></div>
+      <div id="hotels-header-details">
+        <div id="hotels-widgets-container" class="header-detail d-flex flex-fill-1">1</div>
+        <div id="hotels-location" class="header-detail subtle-shadow d-flex"></div>
+        <div id="right-hotel-header-container" class="header-detail"></div>
       </div>
     </div>
   </div>
-  <div id="hotels" class="row hotels d-none"></div>
-  <div id="map-container" class="container-fluid map-container d-none">
-    <div id="map"></div>
+
+  <div id="hotels-toolbar-container" class="container-fluid d-none">
+    <div class="col-12 d-flex justify-content-center">
+      <div class="dropdown" id="dropDown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          FILTER
+        </button>
+
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" id="item1" href="#" data-index="REVIEW">REVIEW</a></li>
+          <li><a class="dropdown-item" id="item2" href="#" data-index="RECOMMENDED">RECOMMENDED</a></li>
+          <li><a class="dropdown-item" id="item3" href="#" data-index="DISTANCE">DISTANCE</a></li>
+        </ul>
+      </div>
+    </div>
   </div>
+
+  <div id="hotels-container" class="container-fluid d-none"></div>
 
   <!-- Footer Start -->
   <footer class="container-fluid footer">
     <div class="row">
-      <div id="social-container" class="col-12 col-md-7 d-flex justify-content-center pt-5">
-        <div id="social-wrapper" class="pb-5 pb-md-0">
-          <div class="footer-section mb-5">
-            <h1 class="footer-section-header">CONTACT US</h1>
-            <p>Company@domain.com</p>
-          </div>
 
-          <div class="footer-section mb-5">
-            <h1 class="footer-section-header">FOLLOW US</h1>
 
-            <div>
-              <span class="fa-stack fa-sm">
-                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
-                <i class="fa-brands fa-facebook-f fa-stack-1x"></i>
-              </span>
-
-              <span class="fa-stack fa-sm">
-                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
-                <i class="fa-brands fa-linkedin-in fa-stack-1x"></i>
-              </span>
-
-              <span class="fa-stack fa-sm">
-                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
-                <i class="fa-brands fa-instagram fa-stack-1x"></i>
-              </span>
-
-              <span class="fa-stack fa-sm">
-                <i class="fa-solid fa-circle fa-stack-2x text-white"></i>
-                <i class="fa-brands fa-x-twitter fa-stack-1x"></i>
-              </span>
-            </div>
-          </div>
-
-          <div class="footer-section">
-            <p class="copyright-notice">© 2024 Company. | All rights reserved</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="newsletter-container" class="col-12 col-md-5 pt-5">
+      <div id="newsletter-container" class="col-12 col-md-6 pt-5 order-md-2">
         <div id="newsletter-subscription" class="d-block d-md-inline-block ms-0 ms-md-5 pb-5 pb-md-3">
           <div class="d-flex flex-column align-items-center">
             <h1 class="footer-section-header">SUBSCRIBE NOW</h1>
@@ -164,12 +140,13 @@
             <p class="fs-5 text-black">Join Our Newsletter</p>
             <form class="row form form-group">
               <div class="col-12">
-                <input type="email" id="email-input"
+                <input type="email" id="newsletter-email-input"
                   class="form-control subscribe-form-element text-center py-3 mb-2 drop-shadow"
                   placeholder="ENTER EMAIL...">
               </div>
               <div class="col-12">
-                <button type="submit" class="form-control subscribe-form-element text-center py-3 bg-black text-white">
+                <button type="submit" id="newsletter-subscribe-button"
+                  class="form-control subscribe-form-element text-center py-3 btn">
                   SUBSCRIBE<i class="fa-solid fa-arrow-right-long ms-3"></i>
                 </button>
               </div>
@@ -177,18 +154,125 @@
           </div>
         </div>
       </div>
+
+      <div id="social-container" class="col-12 col-md-6 d-flex justify-content-center pt-5 order-md-1 ">
+        <div id="social-wrapper" class="pb-5 pb-md-0">
+          <div class="footer-section mb-3">
+            <h1 class="footer-section-header">CONTACT US</h1>
+            <p>Company@domain.com</p>
+          </div>
+
+          <div id="follow-us-section" class="footer-section mb-3">
+            <h1 class="footer-section-header">FOLLOW US</h1>
+
+            <div class="social-icons-container">
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x"></i>
+                <i class="fa-brands fa-facebook-f fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x"></i>
+                <i class="fa-brands fa-linkedin-in fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x"></i>
+                <i class="fa-brands fa-instagram fa-stack-1x"></i>
+              </span>
+
+              <span class="fa-stack fa-sm">
+                <i class="fa-solid fa-circle fa-stack-2x"></i>
+                <i class="fa-brands fa-x-twitter fa-stack-1x"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <p class="copyright-notice">&copy; 2024 Company. | All rights reserved</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
+    <!-- <div class="row">
       <div class="fluid-container">
         <div class="footer-spacer"></div>
       </div>
-    </div>
+    </div> -->
   </footer>
   <!-- Footer End -->
 
+  <!-- Modal -->
+  <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-lg-down">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <div class="container-fluid">
+            <h1 id="modal-title" class="modal-title">Modal
+              title
+            </h1>
+          </div>
+          <button type="button" class="btn-close align-self-start" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6">
+                <div id="carousel"
+                  class="carousel carousel-dark slide position-relative prominent-section overflow-hidden"
+                  data-bs-ride="carousel">
+                  <div id="carousel-inner" class="carousel-inner h-100 d-flex"></div>
 
-  <!-- Popper.js, Bootstrap JS, Font Awesome -->
+                  <div class="col-12 mt-4 position-absolute bottom-0 ">
+                    <ul id="carousel-list" class="list-group list-group-horizontal">
+                      <li id="modal-price"
+                        class="list-group-item flex-fill modal-price d-flex flex-column text-center justify-content-center">
+                      </li>
+                      <li id="modal-rating"
+                        class="list-group-item flex-fill modal-rating d-flex flex-column text-center justify-content-center">
+                      </li>
+                      <li id="modal-reviews"
+                        class="list-group-item flex-fill modal-reviews d-flex flex-column text-center justify-content-center">
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div id="modal-map-container" class="col-md-6 mt-4 mt-md-0">Map</div>
+            </div>
+            <div id="modal-recommendations" class="row mt-4">
+              <div class="col-12">
+                <h2 class="text-center">Things to do...</h2>
+              </div>
+              <div class="col-3">
+                <h3></h3>
+                <ul class="list-group">
+                  <li class="list-group-item"></li>
+                </ul>
+              </div>
+              <div class="col-3">Bars and Pubs</div>
+              <div class="col-3">Entertainment</div>
+              <div class="col-3">Culture</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal End-->
+
+  <!-- Google API Script -->
+  <script>
+    (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
+      key: "AIzaSyBJNC4LwGW7sqqe3MY_8oIwhb4qy-A1viQ",
+      v: "weekly",
+    });
+  </script>
+
+  <!-- Popper.js, Bootstrap JS, Font Awesome, Leaflet JS, Day JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
@@ -197,11 +281,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
     integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
     crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
-    integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg=="
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-extra-markers/1.2.2/js/leaflet.extra-markers.js"
+    integrity="sha512-DETKQz6E4+71mS8bSCEcwyEI8Ogd5/I6FcsgUkGZT6YfW43qOwjwJ8uXP70ox2Q+w2UKlbS5yNko1YkcS4TPqQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <script src="./assets/script/script.js"> </script>
+  <script src="./assets/script/script.js"></script>
+
 </body>
 
 </html>

@@ -1,0 +1,35 @@
+#modal {
+    .modal-content {
+        background-color: var(--color-6);
+        border-radius: 10px;
+        border: 0;
+    }
+
+    .prominent-section {
+        height: 400px;
+        border-radius: 5px;
+    }
+
+    .modal-title {
+        margin-top: 10px;
+    }
+
+    #carousel-list {
+        .list-group-item {
+            border-radius: 0px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.3);
+        }
+
+        .list-group-item:first-child {
+            border-bottom-left-radius: 5px !important;
+            border-right: none;
+        }
+
+        .list-group-item:last-child {
+            border-bottom-right-radius: 5px !important;
+            border-left: none;
+        }
+    }
+
+}
