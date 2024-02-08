@@ -5,6 +5,8 @@ var loadingSpinnerContainer = document.getElementById('hotel-search-loading-spin
 var jumbotronContainer = document.getElementById('jumbotron-container');
 var jumbotron = document.getElementById('jumbotron');
 
+var hotelsToolbarContainer = document.getElementById('hotels-toolbar-container');
+
 var hotelSearchLocationElement = document.getElementById('hotels-location');
 var hotelSearchForm = document.getElementById('hotel-search-form');
 var hotelSearchButton = document.getElementById('hotel-search-button');
@@ -760,6 +762,7 @@ function createMapContainer() {
 function putPageIntoLoadingState() {
   showElement(loadingSpinnerContainer);
   hideElement(hotelSearchIcon);
+  hideElement(hotelsToolbarContainer);
   // hideElement(hotelsHeaderContainer);
   // hideElement(hotelsBodyContainer);
   makeFaint(hotelsHeaderContainer);
@@ -773,6 +776,7 @@ function putPageIntoLoadingState() {
 function takePageOutOfLoadingState() {
   hideElement(loadingSpinnerContainer);
   showElement(hotelSearchIcon);
+  showElement(hotelsToolbarContainer);
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
   makeNotFaint(hotelsHeaderContainer);
@@ -908,7 +912,7 @@ $(".dropdown-item").on("click", function (event) {
 
 window.addEventListener('load', function () {
   hotelSearchBox.focus();
-  searchLocationForHotels({}, 'London');
+  // searchLocationForHotels({}, 'London');
 });
 
 /* Maps functionality Start */
@@ -1519,6 +1523,4 @@ function createClickListener(title, markerView) {
     infoWindow.open(markerView.map, markerView);
   };
 }
-
-
 /** Modal map Google Maps End */
