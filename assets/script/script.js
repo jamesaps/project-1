@@ -130,24 +130,31 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
     hotelSearchBox.value = overrideLocation;
   }
 
-  var locationName = hotelSearchBox.value;
+  try {
+    var locationName = hotelSearchBox.value;
 
-  hotelSearchBox.blur();
+    hotelSearchBox.blur();
 
-  putPageIntoLoadingState();
+    putPageIntoLoadingState();
 
-  await simulateNetworkCall();
+    await simulateNetworkCall();
 
-  var regionDetails = await getRegionDetailsByLocationName(locationName);
+    var regionDetails = await getRegionDetailsByLocationName(locationName);
 
-  var regionImageSearchString = `${regionDetails.name}`;
-  var [hotels, weatherWidgets, regionImage] = await Promise.all(
-    [
-      getHotelsByRegionId(regionDetails.id, options),
-      createWeatherWidgets(regionDetails.coordinates),
-      getImagesBasedOnString(regionImageSearchString),
-    ]
-  );
+    var regionImageSearchString = `${regionDetails.name}`;
+    var [hotels, weatherWidgets, regionImage] = await Promise.all(
+      [
+        getHotelsByRegionId(regionDetails.id, options),
+        createWeatherWidgets(regionDetails.coordinates),
+        getImagesBasedOnString(regionImageSearchString),
+      ]
+    );
+  } catch (error) {
+    hotelSearchBox.value = 'Error: please try again'
+    takePageOutOfLoadingState(false);
+
+    return false;
+  }
 
   // console.log(regionImage)
 
@@ -157,6 +164,8 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
   takePageOutOfLoadingState();
   updateMapWithRenderedHotels(hotels, numberOfHotelsToDisplayPerPage);
   scrollToElement(hotelsHeaderContainer);
+
+  return true;
 }
 
 async function getRegionDetailsByLocationName(searchTerm) {
@@ -778,21 +787,26 @@ function putPageIntoLoadingState() {
   loading = true;
 }
 
-function takePageOutOfLoadingState() {
+function takePageOutOfLoadingState(success = true) {
   hideElement(loadingSpinnerContainer);
   showElement(hotelSearchIcon);
+  hotelSearchButton.disabled = false;
+  makeNotFaint(hotelsHeaderContainer);
+  makeNotFaint(hotelsBodyContainer);
+  loading = false;
+
+  if (!success) {
+    return;
+  }
+
   showElement(hotelsToolbarContainer);
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
-  makeNotFaint(hotelsHeaderContainer);
-  makeNotFaint(hotelsBodyContainer);
-  hotelSearchButton.disabled = false;
+
   showElement(mapContainer);
   // clearSearchBar();
 
   dockJumbotron();
-
-  loading = false;
 }
 
 function makeFaint(element) {

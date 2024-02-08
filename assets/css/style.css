@@ -186,10 +186,8 @@
      font-size: 0.75rem;
  }
 
- @media screen and (min-width: 768px) {
-     .footer .row {
-         padding: 10px;
-     }
+ .footer .row {
+     padding: 10px;
  }
 
  #email-input {
@@ -197,8 +195,18 @@
  }
 
  .subscribe-form-element {
-     font-size: 0.6rem;
-     border-radius: 0;
+     font-size: .6rem;
+ }
+
+ #newsletter-container {
+     background-color: white;
+     border-radius: 10px;
+     display: flex;
+     justify-content: center;
+ }
+
+ #newsletter-subscribe-button {
+     background-color: var(--color-4-faint);
  }
 
  #newletter-subscription {
@@ -218,6 +226,33 @@
 
  .fa-stack {
      margin-bottom: 5px;
+     cursor: pointer;
+ }
+
+ .fa-stack i:first-child {
+     color: white;
+ }
+
+ .fa-stack i:last-child {
+     color: var(--color-4);
+ }
+
+ .fa-stack:hover {
+     font-size: 2em;
+ }
+
+ .fa-stack:hover i:first-child {
+     color: var(--color-4);
+ }
+
+ .fa-stack:hover i:last-child {
+     color: white;
+ }
+
+ .social-icons-container {
+     display: flex;
+     align-items: center;
+     height: 50px;
  }
 
  /* Footer End */
@@ -332,7 +367,7 @@
  #hotels-container {
      display: grid;
      padding: 10px;
-     padding-top: 0;
+     padding-bottom: 0;
      gap: 10px;
  }
 
@@ -516,7 +551,7 @@
  #hotels-header-container,
  #hotels-toolbar-container {
      padding: 10px;
-     padding-top: 0;
+     padding-bottom: 0;
      /* background-color: var(--color-6); */
  }
 
@@ -633,4 +668,11 @@
 
  .subtle-shadow {
      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+ }
+
+ #alert {
+     z-index: 1001;
+     position: fixed;
+     bottom: 0;
+     left: 10px
  }
