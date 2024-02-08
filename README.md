@@ -11,15 +11,17 @@ Our dedication to a streamlined and simplified user experience led us to develop
 
 ## Travel App Usage/Visuals
 
-![Search Feature]()
+![Search Feature](./assets/images/search.png)
+
+![Info Display](./assets/images/info.png)
   
-![Hotel Results]()
+![Hotel Results](./assets/images/hotels.png)
 
-![Map Display]()
+![Map Display](./assets/images/map.png)
 
-![Modal Overview]()
+![Modal Overview](./assets/images/modal.png)
 
-![Details of Eg Restaurants]()
+![Details of Eg Restaurants](./assets/images/recommendations.png)
 
 ![Gif Navigiating the App]()
 
