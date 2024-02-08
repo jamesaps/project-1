@@ -60,13 +60,17 @@ Thank you to all collaborators on this Project
 #### Modal
 - Adam Debski
 - James Stott
+  
 
-
-## References
-[Rapid API](rapidapi.com/)
+## Libraries and APIs
+[Hotels.com API](https://rapidapi.com/tipsters/api/hotels-com-provider)
+[Google Maps API](https://developers.google.com/maps)
 [Bootstrap](https://getbootstrap.com/)
-[]()
-
+[LeafletJS](https://leafletjs.com)
+[Open Weather Map](https://openweathermap.org)
+[Pexels](https://www.pexels.com/api/)
+[Unsplash](https://unsplash.com/developers)
+[Open Trip Map](https://dev.opentripmap.org/product)
 
 ## Deployed Project 
 [Travel App](https://adam-deb.github.io/project-1/)
