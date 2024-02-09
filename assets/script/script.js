@@ -54,6 +54,53 @@ var saveOptions = {
   recommendations: 4,
 }
 
+var weatherIconMapping = {
+  200: 'thunder',
+  201: 'thunder',
+  202: 'thunder',
+  210: 'thunder',
+  211: 'thunder',
+  212: 'thunder',
+  221: 'thunder',
+  230: 'thunder',
+  231: 'thunder',
+  232: 'thunder',
+
+  300: 'rainy-4',
+  301: 'rainy-4',
+  302: 'rainy-5',
+  310: 'rainy-4',
+  311: 'rainy-4',
+  312: 'rainy-5',
+  313: 'rainy-5',
+  314: 'rainy-6',
+  321: 'rainy-5',
+
+  500: 'rainy-4',
+  501: 'rainy-5',
+  502: 'rainy-6',
+  503: 'rainy-6',
+  504: 'rainy-6',
+  511: 'rainy-7',
+  520: 'rainy-4',
+  521: 'rainy-5',
+  522: 'rainy-6',
+  531: 'rainy-6',
+
+  600: 'snowy-4',
+  601: 'snowy-5',
+  602: 'snowy-6',
+  611: 'snowy-5',
+  612: 'snowy-4',
+  613: 'rainy-7',
+  615: 'snowy-4',
+  616: 'snowy-5',
+  620: 'snowy-4',
+  621: 'snowy-5',
+  622: 'snowy-6',
+
+};
+
 var searchTermsData = {}; // { searchTerm: regionId }
 var regionsData = {}; // { regionId: [{id, name}]}
 var hotelsData = {}; // { regionId: [hotel+options] }
@@ -141,6 +188,8 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
 
     var regionDetails = await getRegionDetailsByLocationName(locationName);
 
+    console.log(regionDetails);
+
     var regionImageSearchString = `${regionDetails.name}`;
     var [hotels, weatherWidgets, regionImage] = await Promise.all(
       [
@@ -153,6 +202,7 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
     hotelSearchBox.value = 'Error: please try again'
     takePageOutOfLoadingState(false);
 
+    throw (error)
     return false;
   }
 
@@ -1085,7 +1135,7 @@ async function getCurrentWeatherData(coordinates) {
   currentWeatherData.temperature = convertTemperatureInKtoC(weatherData.main.temp).toFixed(0); // API returns weather in Kelvin so we convert to Celsius using a helper function before returning
   currentWeatherData.wind = convertMpsToKph(weatherData.wind.speed).toFixed(2); // API returns m/s so we convert to kph first
   currentWeatherData.humidity = weatherData.main.humidity;
-  currentWeatherData.weatherIcons = weatherData.weather.map(condition => condition.icon);
+  currentWeatherData.weather = weatherData.weather.map(condition => ({ id: condition.id, fallbackIcon: condition.icon }));
 
   return currentWeatherData;
 }
@@ -1142,13 +1192,26 @@ async function createWeatherWidgets(coordinates) {
 
   weatherWidgets.push(temperatureWidget);
 
-  if (weatherData.weatherIcons && weatherData.weatherIcons.length > 0) {
-    weatherIconWidget.style.backgroundImage = `url(${weatherApiImagePrefix}${weatherData.weatherIcons[0]}@2x.png)`;
+  if (weatherData.weather && weatherData.weather.length > 0) {
+    setWeatherIconFromWeatherData(weatherData.weather, weatherIconWidget);
 
     weatherWidgets.push(weatherIconWidget);
   }
 
   return weatherWidgets;
+}
+
+function setWeatherIconFromWeatherData(weather, widget) {
+  var condition = weather[0];
+  var animatedWeatherIcon = weatherIconMapping[condition.id];
+
+  if (animatedWeatherIcon === undefined) {
+    widget.style.backgroundImage = `url(${weatherApiImagePrefix}${condition.fallbackIcon}@2x.png)`;
+
+    return;
+  }
+
+
 }
 
 /* Weather functionality End */
@@ -1161,7 +1224,7 @@ async function getImagesBasedOnString(string) {
   var imageFromLocalStorage = getImagesBasedOnStringFromLocalStorage(string);
 
   var choosePexels = new Set();
-  // choosePexels.add('London');
+  choosePexels.add('london');
 
   if (imageFromLocalStorage !== undefined) {
     return getRandomElementFromArray(imageFromLocalStorage);
@@ -1177,9 +1240,11 @@ async function getImagesBasedOnString(string) {
 
   if (images === undefined) {
     images = await getImagesBasedOnStringPexels(string);
+    console.log('**')
+    console.log(images)
   }
 
-  if (!triedUnsplash) {
+  if (images === undefined && !triedUnsplash) {
     images = await getImageBasedOnStringUnsplash(string);
   }
 
