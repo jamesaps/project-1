@@ -1,3 +1,5 @@
+var appVersion = '2024-02-09 21:55';
+
 var loading = false;
 var jumbotronDocked = false;
 
@@ -63,6 +65,14 @@ var recommendationsData = {}; // { "lat,lon": [{category: placeToGo}] }
 loadDataFromLocalStorage();
 
 function loadDataFromLocalStorage() {
+  var localStorageVersion = localStorage.getItem('appVersion');
+
+  if (localStorageVersion !== appVersion) {
+    localStorage.clear();
+    localStorage.setItem('appVersion', appVersion);
+    return;
+  }
+
   var localStorageSearchTerms = localStorage.getItem('searchTerms');
   var localStorageRegions = localStorage.getItem('regions');
   var localStorageHotels = localStorage.getItem('hotels');
