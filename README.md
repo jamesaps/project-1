@@ -11,17 +11,23 @@ Our dedication to a streamlined and simplified user experience led us to develop
 
 ## Travel App Usage/Visuals
 
+### Search Feature:
 ![Search Feature](./assets/images/search.png)
 
+### Information Display:
 ![Info Display](./assets/images/info.png)
-  
+
+### Hotel Results:  
 ![Hotel Results](./assets/images/hotels.png)
 
+### Map Display:
 ![Map Display](./assets/images/map.png)
 
+### Modal Overview:
 ![Modal Overview](./assets/images/modal.png)
 
-![Details of Eg Restaurants](./assets/images/recommendations.png)
+### Locations Near Hotel:
+![Locations Near Hotel](./assets/images/recommendations.png)
 
 ## Support
 For support with App Features email: Company@domain.com
@@ -63,9 +69,19 @@ Thank you to all collaborators on this Project
 
 
 ## References
-[Rapid API](rapidapi.com/)
-[Bootstrap](https://getbootstrap.com/)
-[]()
+
+### APIs Used
+- Hotel Search and Card Generation: [Rapid API](rapidapi.com/)
+- Weather on Collapsed Jumbotron: [Open Weather Map API](https://openweathermap.org)
+- Images: [Pexels API](https://www.pexels.com/api/) [Unsplash](https://unsplash.com/developers)
+- Map (below hotel cards): [LeafletJS API](https://leafletjs.com)
+- Modal Nearby Locations: [OpenTripMap API](https://dev.opentripmap.org/docs)
+- Modal Map: [Google Maps API](https://developers.google.com/maps/documentation/javascript)
+- Local Storage: [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Storage)
+
+### Libraries Used
+- [Bootstrap](https://getbootstrap.com/)
+- [jQuery](https://jquery.com/)
 
 
 ## Deployed Project 

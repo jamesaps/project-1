@@ -1,3 +1,5 @@
+var appVersion = '2024-02-09 21:55';
+
 var loading = false;
 var jumbotronDocked = false;
 
@@ -110,6 +112,14 @@ var recommendationsData = {}; // { "lat,lon": [{category: placeToGo}] }
 loadDataFromLocalStorage();
 
 function loadDataFromLocalStorage() {
+  var localStorageVersion = localStorage.getItem('appVersion');
+
+  if (localStorageVersion !== appVersion) {
+    localStorage.clear();
+    localStorage.setItem('appVersion', appVersion);
+    return;
+  }
+
   var localStorageSearchTerms = localStorage.getItem('searchTerms');
   var localStorageRegions = localStorage.getItem('regions');
   var localStorageHotels = localStorage.getItem('hotels');
@@ -811,7 +821,7 @@ function createHotelContainerHeader(regionName, weatherWidgets, regionImage) {
 function createMapContainer() {
   mapContainer = document.createElement('div');
   mapContainer.setAttribute('id', 'map-container');
-  mapContainer.classList.add('d-none');
+  // mapContainer.classList.add('d-none');
   mapContainer.style.gridArea = 'map';
 
   var mapElement = document.createElement('div');
@@ -829,10 +839,11 @@ function putPageIntoLoadingState() {
   hideElement(hotelsToolbarContainer);
   // hideElement(hotelsHeaderContainer);
   // hideElement(hotelsBodyContainer);
+  // hideElement(mapContainer);
+
   makeFaint(hotelsHeaderContainer);
   makeFaint(hotelsBodyContainer);
   hotelSearchButton.disabled = true;
-  // hideElement(mapContainer);
 
   loading = true;
 }
@@ -848,16 +859,26 @@ function takePageOutOfLoadingState(success = true) {
   if (!success) {
     return;
   }
+  
+  showSearchResults();
+  clearSearchBar();
+  dockJumbotron();
+}
 
+function showSearchResults() {
   showElement(hotelsToolbarContainer);
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
 
-  showElement(mapContainer);
-  // clearSearchBar();
-
-  dockJumbotron();
+  // showElement(mapContainer);
 }
+
+function hideSearchResults() {
+  hideElement(hotelsToolbarContainer);
+  hideElement(hotelsHeaderContainer);
+  hideElement(hotelsBodyContainer);
+}
+
 
 function makeFaint(element) {
   if (element === undefined || element === null) {
@@ -934,10 +955,20 @@ function dockJumbotron() {
   }
 
   jumbotronDocked = true;
-  jumbotron.classList.add('docked-jumbotron');
 
+  jumbotron.classList.add('docked-jumbotron');
   hotelSearchForm.classList.add('docked-hotel-search-form');
+
   hotelSearchForm.classList.remove('col-md-8');
+}
+
+function undockJumbotron() {
+  jumbotronDocked = false;
+
+  jumbotron.classList.remove('docked-jumbotron');
+  hotelSearchForm.classList.remove('docked-hotel-search-form');
+
+  hotelSearchForm.classList.add('col-md-8');
 }
 
 function convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(object) {
@@ -1612,3 +1643,17 @@ function createClickListener(title, markerView) {
   };
 }
 /** Modal map Google Maps End */
+
+/* Navbar Function  */
+
+document.getElementById('homeLink').addEventListener('click', function() {
+  clearSearchResults();
+
+});
+
+function clearSearchResults() {
+  hideSearchResults();
+  undockJumbotron();
+}
+
+/* Navbar Function  */
