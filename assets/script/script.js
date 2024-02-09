@@ -884,10 +884,20 @@ function dockJumbotron() {
   }
 
   jumbotronDocked = true;
-  jumbotron.classList.add('docked-jumbotron');
 
+  jumbotron.classList.add('docked-jumbotron');
   hotelSearchForm.classList.add('docked-hotel-search-form');
+
   hotelSearchForm.classList.remove('col-md-8');
+}
+
+function undockJumbotron() {
+  jumbotronDocked = false;
+
+  jumbotron.classList.remove('docked-jumbotron');
+  hotelSearchForm.classList.remove('docked-hotel-search-form');
+
+  hotelSearchForm.classList.add('col-md-8');
 }
 
 function convertObjectToArrayOfKeyValuePairsSortedByKeyAsJSONString(object) {
@@ -1548,36 +1558,15 @@ function createClickListener(title, markerView) {
 }
 /** Modal map Google Maps End */
 
-
-
 /* Navbar Function  */
 
 document.getElementById('homeLink').addEventListener('click', function() {
   clearSearchResults();
 
-  document.querySelector('.jumbotron').style.height = 'calc(100vh - 101px - 20px)';
-  document.querySelector('.jumbotron').style.backgroundPosition = 'center'; 
-  document.getElementById('hotel-search-box').style.height = 'calc(10vh )';
-  document.getElementById('hotel-search-box').style.width = 'calc(30vh)';
-  document.getElementById('hotel-search-box').style.borderColor = 'rgba(255, 255, 255, 0.8)'; 
-  document.getElementById('hotel-search-box').style.color = 'var(--color-4)'
-  document.getElementById('hotel-search-box').value = ''; 
-  document.getElementById('hotel-search-button').style.height = '55px';
-  document.getElementById('hotel-search-button').style.width = '55px';
 });
 
 function clearSearchResults() {
-  document.getElementById('hotels-container').innerHTML = '';
-  document.getElementById('hotels-container').classList.add('d-none');
-  document.getElementById('hotels-header-container').classList.add('d-none');
-  document.getElementById('hotels-toolbar-container').classList.add('d-none');
-  document.getElementById('jumbotron-container').classList.remove('d-none');
-  document.getElementById('jumbotron-container').classList.remove('docked-jumbotron');
+  undockJumbotron();
 }
 
 /* Navbar Function  */
-
-
-
-
-
