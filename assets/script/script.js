@@ -761,7 +761,7 @@ function createHotelContainerHeader(regionName, weatherWidgets, regionImage) {
 function createMapContainer() {
   mapContainer = document.createElement('div');
   mapContainer.setAttribute('id', 'map-container');
-  mapContainer.classList.add('d-none');
+  // mapContainer.classList.add('d-none');
   mapContainer.style.gridArea = 'map';
 
   var mapElement = document.createElement('div');
@@ -779,10 +779,11 @@ function putPageIntoLoadingState() {
   hideElement(hotelsToolbarContainer);
   // hideElement(hotelsHeaderContainer);
   // hideElement(hotelsBodyContainer);
+  // hideElement(mapContainer);
+
   makeFaint(hotelsHeaderContainer);
   makeFaint(hotelsBodyContainer);
   hotelSearchButton.disabled = true;
-  // hideElement(mapContainer);
 
   loading = true;
 }
@@ -798,16 +799,26 @@ function takePageOutOfLoadingState(success = true) {
   if (!success) {
     return;
   }
+  
+  showSearchResults();
+  clearSearchBar();
+  dockJumbotron();
+}
 
+function showSearchResults() {
   showElement(hotelsToolbarContainer);
   showElement(hotelsHeaderContainer);
   showElement(hotelsBodyContainer);
 
-  showElement(mapContainer);
-  // clearSearchBar();
-
-  dockJumbotron();
+  // showElement(mapContainer);
 }
+
+function hideSearchResults() {
+  hideElement(hotelsToolbarContainer);
+  hideElement(hotelsHeaderContainer);
+  hideElement(hotelsBodyContainer);
+}
+
 
 function makeFaint(element) {
   if (element === undefined || element === null) {
@@ -1566,6 +1577,7 @@ document.getElementById('homeLink').addEventListener('click', function() {
 });
 
 function clearSearchResults() {
+  hideSearchResults();
   undockJumbotron();
 }
 
