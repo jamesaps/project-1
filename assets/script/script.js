@@ -135,6 +135,7 @@ function saveObjectToLocalStorage(key, data) {
 async function searchLocationForHotels(options = {}, overrideLocation) {
   // if script is already processing a previous request, prevent a new request from being processed
   if (loading === true) {
+    console.log('Currently loading. New search attempt was rejected.');
     return;
   }
 
@@ -142,7 +143,9 @@ async function searchLocationForHotels(options = {}, overrideLocation) {
     hotelSearchBox.value = overrideLocation;
   }
 
-  if (currentSearchLocation === undefined) {
+  console.log(options)
+
+  if (currentSearchLocation === undefined || options.searchType === 'search') {
     currentSearchLocation = hotelSearchBox.value;
   }
 
@@ -955,7 +958,7 @@ function getRandomInt(min, max) {
 
 $(hotelSearchForm).on('submit', function (event) {
   event.preventDefault();
-  searchLocationForHotels();
+  searchLocationForHotels({searchType: 'search'});
 });
 
 $(".dropdown-item").on("click", function (event) {
@@ -964,7 +967,7 @@ $(".dropdown-item").on("click", function (event) {
   // Update sortOrder when an item is clicked
   sortOrder = $(this).data("index");
 
-  searchLocationForHotels({ sortOrder });
+  searchLocationForHotels({ sortOrder, searchType: 'filter' });
 });
 
 window.addEventListener('load', function () {
